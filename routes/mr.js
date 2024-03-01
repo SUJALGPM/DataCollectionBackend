@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require("multer")
 
-const { createMr, loginMr, getDoctorForThisMr, getAllMR, getMrById, UpdateMrMobileNumber, handleExcelSheetUpload, getMrDoctorSummary, getMrBrandSummary, getMrPatients, mrUpdatePatientStatus } = require('../controller/mr');
+const { createMr, loginMr, getDoctorForThisMr, getAllMR, getMrById, UpdateMrMobileNumber, handleExcelSheetUpload, getMrDoctorSummary, getMrBrandSummary, getMrPatients, mrUpdatePatientStatus, mrAddNewBrand, mrGetDoctorBrandWise, mrGetDataBrandWise } = require('../controller/mr');
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -25,5 +25,10 @@ router.get("/get-mr-patients/:id", getMrPatients);
 
 router.put("/change-patient-status/:mrID/:patientID", mrUpdatePatientStatus);
 
+router.post("/add-new-brand-repurchase/:mrID/:patientID", mrAddNewBrand);
 
-module.exports = router
+router.get("/get-mr-brandwise-data/:mrId", mrGetDataBrandWise);
+
+router.get("/get-mr-doctor-brandwise/:mrId", mrGetDoctorBrandWise);
+
+module.exports = router;

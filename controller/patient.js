@@ -86,7 +86,7 @@ const createPatients = async (req, res) => {
             NoUnitPurchased: NoUnitPurchased,
             Month: Month,
             Year: Year,
-            PatientStatus: PatientStatus === 'discontinue',
+            PatientStatus: PatientStatus === 'DISCONTINUE' ? false : true,
             Reason: Reason,
             PatientType: PatientType,
             doc: Date.now(),
