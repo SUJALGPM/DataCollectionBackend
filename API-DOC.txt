@@ -1,0 +1,60 @@
+1. To Create The MR.
+-POST METHOD
+-API ROUTE https://mr-backend-srwb.onrender.com/api/create-mr
+-Details should go inside the body
+
+
+2.To login the MR.
+- POST METHOD
+- API ROUTE https://mr-backend-srwb.onrender.com/api/login-mr 
+- Details should go inside the body
+
+
+3.To get the MR ALL DOCTORS
+- GET METHOD
+- API ROUTE https://mr-backend-srwb.onrender.com/api/get-mr-doctor/:id
+- ID should be of MR 
+
+
+4.To create a DOCTOR IN PERTICULAR MR 
+- POST METHOD
+- API ROUTE https://mr-backend-srwb.onrender.com/api/create-doctor/:id
+- ID SHOULD BE OF MR 
+
+
+5.TO GET ALL DOCTORS
+- GET METHOD
+- API ROUTE https://mr-backend-srwb.onrender.com/api/get-all-doctors
+
+
+
+6.TO GET ALL THE PATIENT FOR A PERTICULAR DOCTOR
+- GET METHOD
+- API ROUTE https://mr-backend-srwb.onrender.com/api/get-doctor-patient/:id
+- ID SHOULD BE OF THE DOCTOR 
+
+
+7. TO CREATE A PATIENT IN A PERTICULAR DOCTOR 
+- POST METHOD 
+- API ROUTE https://mr-backend-srwb.onrender.com/api/create-patient/:id
+- ID SHOULD OF THE DOCTOR
+
+
+8. TO GET ALL THE PATIENTS 
+- GET METHOD 
+- API ROUTE https://mr-backend-srwb.onrender.com/api/get-all-patients 
+
+
+MOST IMP API 
+9. TO UPDATE THE PATIENT REPURCHASE
+- PUT METHOD 
+- API ROUTE https://mr-backend-srwb.onrender.com/api/update-patient-repurchase/:id
+- ID SHOULD BE OF THE PATIENT 
+
+
+10. TO GET ALL THE MR'S 
+- GET METHOD 
+- API ROUTE https://mr-backend-srwb.onrender.com/api/get-all-mr 
+
+
+
