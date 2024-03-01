@@ -759,7 +759,7 @@ const mrGetDoctorBrandWise = async (req, res) => {
         }
 
         // Respond with the speciality-wise brand counts
-        res.status(200).json(responseObj);
+        res.status(200).json({ "DrSpeciality": responseObj });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Failed to fetch the data brand-wise", success: false });
