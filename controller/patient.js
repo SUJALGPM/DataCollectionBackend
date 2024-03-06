@@ -128,9 +128,8 @@ const createPatients = async (req, res) => {
 }
 
 
-
 const dataPushToPatient = async (req, res) => {
-    const id = req.params['id'];
+    const id = req.params.id;
     const {
         DurationOfTherapy,
         TotolCartiridgesPurchase,
@@ -144,23 +143,6 @@ const dataPushToPatient = async (req, res) => {
         selectedOptions,
         repurchaseData
     } = req.body;
-
-
-    console.log({ repurchaseData });
-
-
-
-
-    // const brands = selectedOptions.map(brands => brands.value);
-
-    // if (isNaN(DurationOfTherapy)) {
-    //     return res.status(400).json({ msg: "DurationOfTherapy must be a valid number" });
-    // }
-
-    // const dateFormat = new Date(DateOfPurchase);
-
-    // const dateFormat = moment(DateOfPurchase, 'DD/MM/YYYY', true);
-    // console.log({ dateFormat, DateOfPurchase });
 
     try {
         const patient = await PatientModel.findById({ _id: id });
@@ -238,7 +220,6 @@ const dataPushToPatient = async (req, res) => {
 };
 
 
-
 const getAllPatient = async (req, res) => {
     try {
         const patient = await PatientModel.find({});
@@ -270,7 +251,6 @@ const getPaitentById = async (req, res) => {
         })
     }
 }
-
 
 
 const handleCreateBrands = async (req, res) => {
@@ -386,6 +366,7 @@ const singlePatientFullDetails = async (req, res) => {
         console.log(err);
     }
 }
+
 
 
 module.exports = {

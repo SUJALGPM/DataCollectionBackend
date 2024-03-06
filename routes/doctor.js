@@ -7,10 +7,6 @@ router.post("/create-doctor/:id", createDoctor);
 router.get("/get-doctor-patient/:id", getPatientForThisDoctor);
 router.get('/get-all-doctors', getAllDoctors);
 router.get("/get-doctorby-id/:id", getDoctorById);
-
-
-// reports api 
-
 router.get("/get-reports-data/:mrId", getMrReports);
 
 module.exports = router
