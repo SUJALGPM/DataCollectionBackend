@@ -61,14 +61,15 @@ const createMr = async (req, res) => {
 const loginMr = async (req, res) => {
     try {
         const { MRCODE, PASSWORD } = req.body;
-        const mr = await MrModel.findOne({ MRCODE: MRCODE });
+        
+        const mr = await MrModel.findOne({ EMPID: MRCODE });
         if (!mr) {
             return res.status(400).json({
                 msg: "Mr not Found",
                 success: false
             })
         } else {
-            if (PASSWORD == mr.PASSWORD) {
+            if (PASSWORD == mr.Password) {
                 mr.loginLogs.push({
                     timestamp: new Date(),
                     cnt: mr.loginLogs.length + 1
