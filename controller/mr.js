@@ -274,39 +274,32 @@ const getMrById = async (req, res) => {
 }
 
 const UpdateMrMobileNumber = async (req, res) => {
-
     try {
-
         const { mrId, mobileNumber } = req.body;
 
-        const mr = await MrModel.findById({ _id: mrId });
-        if (!mr) {
-            res.status(400).json({
+        const updatedMr = await MrModel.updateOne(
+            { _id: mrId },
+            { $set: { Number: mobileNumber } }
+        );
+
+        if (updatedMr.nModified === 0) {
+            return res.status(400).json({
                 success: false,
                 msg: "Mr Not Found"
-            })
+            });
         }
-
-        mr.MOBILENO = mobileNumber;
-
-        // Save the updated document
-        const updatedMr = await mr.save();
 
         return res.status(200).json({
             success: true,
-            mr: updatedMr,
             msg: "Mobile number updated successfully"
         });
 
-    }
-
-    catch (error) {
-        const errmsg = error.message;
-        console.log("Error in UpdateMrMobileNumber");
+    } catch (error) {
+        console.log("Error in UpdateMrMobileNumber:", error.message);
         return res.status(500).json({
             success: false,
-            errmsg
-        })
+            errmsg: error.message
+        });
     }
 }
 
