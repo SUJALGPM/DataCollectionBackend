@@ -15,6 +15,10 @@ const mrSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    Number: {
+        type: Number,
+        required: false
+    },
     Region: {
         type: String,
         required: false
@@ -47,7 +51,7 @@ const mrSchema = new mongoose.Schema({
     ],
     doctors: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' }
-    ],
+    ]
 });
 
 

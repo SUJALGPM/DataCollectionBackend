@@ -9,8 +9,6 @@ const tlmModel = require("../models/Tlm");
 const slmModel = require("../models/Slm");
 const flmModel = require('../models/Flm');
 const xlsx = require("xlsx");
-
-
 const patient = require("../models/patient");
 const SECRET = process.env.SECRET;
 
@@ -186,9 +184,6 @@ const handleAdminReports = async (req, res) => {
     }
 };
 
-
-
-
 // const handleAdminSideDetailReports = async (req, res) => {
 //     const adminId = req.params.id;
 
@@ -312,7 +307,6 @@ const handleAdminReports = async (req, res) => {
 // };
 
 
-
 const handleAdminSideDetailReports = async (req, res) => {
     const adminId = req.params.id;
 
@@ -416,8 +410,6 @@ const handleAdminSideDetailReports = async (req, res) => {
     }
 };
 
-
-
 const handleSuperAdminCount = async (req, res, next) => {
     const superAdminCount = await adminModels.countDocuments({ Admin_TYPE: 'SUPER_ADMIN' });
     if (superAdminCount >= 3) {
@@ -427,8 +419,6 @@ const handleSuperAdminCount = async (req, res, next) => {
     }
     next();
 }
-
-
 
 const handleSuperAdminCreate = async (req, res) => {
     try {
@@ -484,7 +474,6 @@ const handleSuperAdminCreate = async (req, res) => {
     }
 }
 
-
 const handleReportAdminCreate = async (req, res) => {
     try {
         const userId = req.headers['userId'];
@@ -523,10 +512,6 @@ const handleReportAdminCreate = async (req, res) => {
         });
     }
 }
-
-
-
-
 
 
 const handleCreateContentAdmin = async (req, res) => {
@@ -638,7 +623,6 @@ const handleAdminPatientWiseReports = async (req, res) => {
     }
 };
 
-
 const handleDoctorWisePatientCount = async (req, res) => {
     try {
         const mrs = await MrModel.find().populate({
@@ -712,8 +696,6 @@ const handleDoctorWisePatientCount = async (req, res) => {
         });
     }
 };
-
-
 
 const handleMrAndPatientReports = async (req, res) => {
     try {
@@ -811,7 +793,6 @@ const handleMrAndPatientReports = async (req, res) => {
     }
 }
 
-
 const calculateBrandDurationOfTherapy = (patient, brand) => {
     let totalDuration = 0;
     patient.Repurchase.forEach(repurchase => {
@@ -890,7 +871,6 @@ const handleDetailedReport = async (req, res) => {
         });
     }
 };
-
 
 const PrescriberReport = async (req, res) => {
     try {
@@ -993,6 +973,7 @@ const uplaodSheet = async (req, res) => {
                     SLMEmpID: row.SLMEmpID,
                     ZBMName: row.ZBMName,
                     Password: row.Password,
+                    doc: Date.now()
                 });
                 await existSlm.save();
                 admin.Slm.push(existSlm._id);
@@ -1007,6 +988,7 @@ const uplaodSheet = async (req, res) => {
                     FLMEmpID: row.FLMEmpID,
                     BDMName: row.BDMName,
                     Password: row.Password,
+                    doc: Date.now()
                 });
                 await existFlm.save();
                 existSlm.Flm.push(existFlm._id);
@@ -1021,10 +1003,12 @@ const uplaodSheet = async (req, res) => {
                     EMPID: row.EMPID,
                     PSNAME: row.PSNAME,
                     Region: row.Region,
+                    Number: row.Number,
                     Password: row.Password,
                     HQ: row.HQ,
                     DOJ: row.DOJ,
                     DESIGNATION: row.DESIGNATION,
+                    doc: Date.now()
                 });
                 await existingMr.save();
                 existFlm.Mrs.push(existingMr._id);
@@ -1055,7 +1039,8 @@ const uplaodSheet = async (req, res) => {
                     DoctorPotential: row.DoctorPotential,
                     POBStatus: row.POBStatus,
                     POBCount: row.POBCount,
-                    DoctorStatus: doctorStatus
+                    DoctorStatus: doctorStatus,
+                    doc: Date.now()
                 });
                 await existingDoctor.save();
 
@@ -1074,10 +1059,13 @@ const uplaodSheet = async (req, res) => {
                     patientStatus = false;
                 }
 
+                // Extract age from the row data and parse it as an integer
+                const age = parseInt(row['Age ']);
+
                 // Create a new doctor entry
                 existingPatient = new PatientModel({
                     PatientName: row.PatientName,
-                    Age: row.Age,
+                    Age: age,
                     Gender: row.Gender,
                     MobileNumber: row.MobileNumber,
                     Location: row.Location,
@@ -1090,6 +1078,7 @@ const uplaodSheet = async (req, res) => {
                     Year: row.Year,
                     PatientStatus: patientStatus,
                     Reason: row.Reason,
+                    doc: Date.now(),
                     PatientType: row.PatientType,
                     Repurchase: {
                         DurationOfTherapy: row.DurationOfTherapy,

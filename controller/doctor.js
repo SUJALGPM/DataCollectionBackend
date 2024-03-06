@@ -5,31 +5,24 @@ const PatienModel = require("../models/patient");
 
 const createDoctor = async (req, res) => {
     try {
-        const { SCCODE, DRNAME, QUALIFICATION, SPECIALITY, SPECBYPRACTICE, PLANNEDVISITS, CLASS, LOCALITY, STATION, STATE, ADDRESS, PIN, MOBILENO, EMAIL, TOTAL_POTENTIAL, BUSTODIV, PATIENTSPERDAY } = req.body
+        const { DoctorName, Specialty, SCCode, Place, CLASS, VF, DoctorPotential } = req.body
         const { id } = req.params;
 
         const newDoctor = new DoctorModel({
-            SCCODE,
-            DRNAME,
-            QUALIFICATION,
-            SPECIALITY,
-            SPECBYPRACTICE,
-            PLANNEDVISITS,
+            DoctorName,
+            Specialty,
+            SCCode,
+            Place,
             CLASS,
-            LOCALITY,
-            STATION,
-            STATE,
-            ADDRESS,
-            PIN,
-            MOBILENO,
-            EMAIL,
-            TOTAL_POTENTIAL,
-            BUSTODIV,
-            PATIENTSPERDAY,
+            VF,
+            DoctorPotential,
             doc: Date.now(),
         });
 
+        //Save the new doctor in database...
         const savedDoctor = await newDoctor.save();
+
+        //Check MrExist or not...
         const mr = await MrModel.findById(id);
         if (mr) {
             mr.doctors.push(savedDoctor._id);
@@ -37,6 +30,7 @@ const createDoctor = async (req, res) => {
         } else {
             return res.status(404).json({ success: false, message: 'MR not found' });
         }
+        
         return res.status(201).json({ success: true, message: 'Doctor created and associated with MR' });
     }
     catch (error) {

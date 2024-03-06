@@ -332,6 +332,62 @@ const getPatinetBrands = async (req, res) => {
     }
 }
 
+const singlePatientFullDetails = async (req, res) => {
+    try {
+        const patientId = req.params.id;
+
+        //Check the patient is exist or not...
+        const patientExist = await PatientModel.findById(patientId);
+        if (!patientExist) {
+            return res.status(404).send({ message: "Patient id not found..!!", success: false });
+        }
+
+        //Fetch the patient details from associated doctor...
+        const doctorFetch = await DoctorModel.findOne({ patients: patientExist });
+        if (!doctorFetch) {
+            return res.status(404).send({ message: "Failed to fetch doctor detail which is associated with patient...!!!", success: false });
+        }
+
+        //Iterate the patient Repurchase data...
+        const patientRepurchaseDetail = patientExist.Repurchase.map(repurchase => ({
+            RDURATION: repurchase.DurationOfTherapy,
+            RUNITSOLD: repurchase.TotolCartiridgesPurchase,
+            RDATE: repurchase.DateOfPurchase,
+            RSTATUS: repurchase.TherapyStatus
+        }));
+
+        // //Iterate the patient Brand Usage...
+        const patientBrandDetail = patientExist.Repurchase.map(repurchaseData => ({
+            BrandName: repurchaseData.Brands
+        }));
+
+        const formateData = {
+            DNAME: doctorFetch.DoctorName,
+            DSPECIALITY: doctorFetch.Specialty,
+            DPLACE: doctorFetch.Place,
+            DSCCODE: doctorFetch.SCCode,
+            DCLASS: doctorFetch.CLASS,
+            DVF: doctorFetch.VF,
+            DDOCTORPOTENTIAL: doctorFetch.DoctorPotential,
+            DSTATUS: doctorFetch.DoctorStatus,
+
+            PNAME: patientExist.PatientName,
+            PTYPE: patientExist.PatientType,
+            PNUMBER: patientExist.MobileNumber,
+            PCITY: patientExist.Location,
+            PAGE: patientExist.Age,
+            PSTATUS: patientExist.PatientStatus,
+            PBRAND: patientBrandDetail,
+            PREPURCHASE: patientRepurchaseDetail
+        }
+
+        res.status(201).json(formateData);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 module.exports = {
     createPatients,
     getAllPatient,
@@ -339,5 +395,6 @@ module.exports = {
     getPaitentById,
     handleCreateBrands,
     getAllBrands,
-    getPatinetBrands
+    getPatinetBrands,
+    singlePatientFullDetails
 }

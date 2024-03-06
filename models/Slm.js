@@ -14,6 +14,7 @@ const slmSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    doc: Date,
     loginLogs: [
         {
             timestamp: {

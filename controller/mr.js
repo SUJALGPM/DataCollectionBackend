@@ -1,4 +1,5 @@
 const MrModel = require('../models/mr');
+const slmModel = require("../models/Slm");
 const DoctorModel = require("../models/doctor")
 const PatientModel = require("../models/patient");
 const AdminModel = require("../models/admin");
@@ -223,14 +224,45 @@ const getAllMR = async (req, res) => {
 const getMrById = async (req, res) => {
     try {
         const mrId = req.params.mrId;
-        const mr = await MrModel.findById({ _id: mrId }).exec();
-        if (!mr) {
+        const mrExist = await MrModel.findById({ _id: mrId }).exec();
+
+        //Check the MrExist or not...
+        if (!mrExist) {
             res.status(400).json({
                 success: false,
                 msg: "Mr Not Found"
             })
         }
-        res.json(mr);
+
+        //Check the FLM is exist or not...
+        const flmExist = await flmModel.findOne({ Mrs: mrExist }).exec();
+        if (!flmExist) {
+            return res.status(404).send({ message: "FLM is not found..!!!", success: false });
+        }
+
+        //Check the SLM is exist or not..
+        const slmExist = await slmModel.findOne({ Flm: flmExist }).exec();
+        if (!slmExist) {
+            return res.status(404).send({ message: "SLM is not found..!!!", success: false });
+        }
+
+        const formatedResponse = {
+            MROBJID: mrExist._id,
+            MRID: mrExist.EMPID,
+            MRNAME: mrExist.PSNAME,
+            MRNUMBER: mrExist.Number,
+            MRPASSWORD: mrExist.Password,
+            MRREGION: mrExist.Region,
+            MRHQ: mrExist.HQ,
+            MRDOJ: mrExist.DOJ,
+            MRDESIGNATION: mrExist.DESIGNATION,
+            FLMName: flmExist.BDMName,
+            SLMName: slmExist.ZBMName,
+            DOCTORSID: mrExist.doctors
+        }
+
+        res.json(formatedResponse);
+
     } catch (error) {
         const errmsg = error.message;
         console.log("Error in getMrById");
@@ -581,10 +613,109 @@ const mrAddNewBrand = async (req, res) => {
         console.log(err);
         res.status(500).send({ message: "Failed to add new brand with repurchase data in patient..!!", success: false });
     }
-}
+};
+
+//Exiting Api response issue..
+// const mrGetDataBrandWise = async (req, res) => {
+
+//     try {
+//         const mrId = req.params.mrId;
+
+//         const mrWithDoctors = await MrModel.findOne({ _id: mrId }).populate({
+//             path: 'doctors',
+//             populate: {
+//                 path: 'patients',
+//             },
+//         });
+
+//         if (!mrWithDoctors) {
+//             return res.status(404).json({ message: 'MR not found' });
+//         }
+
+//         const brandNames = ['TOFASHINE', 'INFIMAB', 'HEADON'];
+
+//         const totalCounts = {
+//             totalDoctor: mrWithDoctors.doctors.length,
+//             totalallbrandsPatientCount: 0,
+//             totalRepurchaseCount: 0,
+//         };
+
+//         const brandStats = {};
+
+//         mrWithDoctors.doctors.forEach((doctor) => {
+//             brandNames.forEach((brandName) => {
+//                 const activePatientCount = doctor.patients.filter((patient) =>
+//                     patient.Repurchase.some(
+//                         (purchase) =>
+//                             purchase.Brands &&
+//                             Array.isArray(purchase.Brands) &&
+//                             purchase.Brands.includes(brandName) &&
+//                             patient.PatientStatus === true
+//                     )
+//                 ).length;
+
+//                 const inactivePatientCount = doctor.patients.filter((patient) =>
+//                     patient.Repurchase.some(
+//                         (purchase) =>
+//                             purchase.Brands &&
+//                             Array.isArray(purchase.Brands) &&
+//                             purchase.Brands.includes(brandName) &&
+//                             patient.PatientStatus === false
+//                     )
+//                 ).length;
+
+//                 const totalRepurchaseCount = doctor.patients.reduce((count, patient) => {
+//                     const repurchaseCount = patient.Repurchase.reduce(
+//                         (repCount, purchase) =>
+//                             purchase.Brands &&
+//                                 Array.isArray(purchase.Brands) &&
+//                                 purchase.Brands.includes(brandName)
+//                                 ? repCount + 1
+//                                 : repCount,
+//                         0
+//                     );
+
+//                     return count + repurchaseCount;
+//                 }, 0);
+
+//                 const TotalPatientCount = activePatientCount + inactivePatientCount;
+
+//                 // Update total counts
+//                 totalCounts.totalallbrandsPatientCount += TotalPatientCount;
+//                 totalCounts.totalRepurchaseCount += totalRepurchaseCount;
+
+//                 // Update brand-specific stats
+//                 if (!brandStats[brandName]) {
+//                     brandStats[brandName] = {
+//                         totalPatientCount: 0,
+//                         activePatientCount: 0,
+//                         inactivePatientCount: 0,
+//                         totalRepurchaseCount: 0,
+//                     };
+//                 }
+
+//                 brandStats[brandName].totalPatientCount += TotalPatientCount;
+//                 brandStats[brandName].activePatientCount += activePatientCount;
+//                 brandStats[brandName].inactivePatientCount += inactivePatientCount;
+//                 brandStats[brandName].totalRepurchaseCount += totalRepurchaseCount;
+//             });
+//         });
+
+//         // Include total counts and brand-specific stats in the response
+//         const responseData = {
+//             ...totalCounts,
+//             ...brandStats,
+//         };
+
+//         res.json(responseData);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Internal Server Error' });
+//     }
+
+// };
 
 const mrGetDataBrandWise = async (req, res) => {
-
     try {
         const mrId = req.params.mrId;
 
@@ -671,7 +802,9 @@ const mrGetDataBrandWise = async (req, res) => {
         // Include total counts and brand-specific stats in the response
         const responseData = {
             ...totalCounts,
-            ...brandStats,
+            brands: Object.keys(brandStats).map((brandName) => ({
+                [brandName]: brandStats[brandName],
+            })),
         };
 
         res.json(responseData);
@@ -679,7 +812,6 @@ const mrGetDataBrandWise = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
-
 };
 
 const mrGetDoctorBrandWise = async (req, res) => {
@@ -765,7 +897,6 @@ const mrGetDoctorBrandWise = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch the data brand-wise", success: false });
     }
 }
-
 
 module.exports = {
     createMr,
