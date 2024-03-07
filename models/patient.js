@@ -33,7 +33,7 @@ const PatientSchema = new mongoose.Schema({
     doc: Date,
     Repurchase: [{
         DurationOfTherapy: {
-            type: Number,
+            type: Number,   
             default: 6
         },
         TotolCartiridgesPurchase: {

@@ -118,44 +118,40 @@ const handleAdminLogin = async (req, res) => {
 }
 
 const handleAdminReports = async (req, res) => {
-    s
     try {
         const adminId = req.params.id;
-        const admin = await adminModels.findById(adminId);
+        const admin = await adminModels.findById(adminId).populate({
+            path: 'Slm',
+            populate: {
+                path: 'Flm',
+                populate: {
+                    path: 'Mrs',
+                    populate: {
+                        path: 'doctors'
+                    }
+                }
+            }
+        });
 
         if (!admin) {
             return res.json({ msg: "Admin Not Found" });
         }
 
-        const mrs = await MrModel.find({ _id: { $in: admin.Mrs } });
+        const mrs = admin.Slm.flatMap(slm => slm.Flm.flatMap(flm => flm.Mrs));
 
-        const mrWithDoctors = await MrModel.aggregate([
-            {
-                $match: {
-                    _id: { $in: admin.Mrs }
-                }
-            },
-            {
-                $lookup: {
-                    from: "doctors",
-                    localField: "doctors",
-                    foreignField: "_id",
-                    as: "doctors"
-                }
-            },
-            {
-                $project: {
-                    MRNAME: 1,
-                    doctorsCount: { $size: "$doctors" }
-                }
-            }
-        ]);
+        const mrWithDoctors = mrs.map(mr => {
+            return {
+                MRNAME: mr.PSNAME,
+                doctorsCount: mr.doctors.length
+            };
+        });
 
         // Find the total number of patients under each doctor
+        const doctorIds = mrs.flatMap(mr => mr.doctors).flatMap(doctor => doctor._id);
         const doctorWithPatients = await DoctorModel.aggregate([
             {
                 $match: {
-                    _id: { $in: mrs.flatMap(mr => mr.doctors).flatMap(doctor => doctor.patients) }
+                    _id: { $in: doctorIds }
                 }
             },
             {
@@ -173,6 +169,7 @@ const handleAdminReports = async (req, res) => {
                 }
             }
         ]);
+
         return res.json({ admin, mrs, mrWithDoctors, doctorWithPatients });
     } catch (error) {
         const errMsg = error.message;
@@ -306,6 +303,108 @@ const handleAdminReports = async (req, res) => {
 //     }
 // };
 
+// const handleAdminSideDetailReports = async (req, res) => {
+//     const adminId = req.params.id;
+
+//     if (!mongoose.Types.ObjectId.isValid(adminId)) {
+//         return res.status(400).json({ error: 'Invalid admin ID format' });
+//     }
+
+//     try {
+//         const adminData = await adminModels
+//             .findById(adminId)
+//             .lean()
+//             .exec();
+
+//         if (!adminData || !adminData.Mrs) {
+//             return res.status(404).json({ error: 'Admin not found or has no related data' });
+//         }
+
+//         const header = [
+//             'adminId',
+//             'adminName',
+//             'Gender',
+//             'MobileNumber',
+//             'mrName',
+//             'mrCode',
+//             'mrHQ',
+//             'mrDESG',
+//             'mrDoc',
+//             'mrTotalDoctor',
+//             'doctorName',
+//             'doctorScCode',
+//             'doctorSpeciality',
+//             'doctorLocality',
+//             'doctorTotalPatients',
+//             'doctorState',
+//             'patientName',
+//             'patientAge',
+//             'PatientType',
+//             'PatientDoc',
+//             'patientRepurchaseLength',
+//             'patientRepurchaseData',
+//         ];
+
+//         const rows = [header];
+
+//         for (const mrId of adminData.Mrs) {
+//             const mr = await MrModel
+//                 .findById(mrId)
+//                 .populate({
+//                     path: 'doctors',
+//                     model: 'Doctor',
+//                     populate: {
+//                         path: 'patients',
+//                         model: 'Patient'
+//                     }
+//                 })
+//                 .exec();
+//             if (!mr) {
+//                 continue;
+//             }
+
+//             if (mr.doctors) {
+//                 mr.doctors.forEach(doctor => {
+//                     if (doctor.patients) {
+//                         doctor.patients.forEach(patient => {
+//                             const patientRow = [
+//                                 adminData.AdminId || 'N/A',
+//                                 adminData.Name || 'N/A',
+//                                 adminData.Gender || 'N/A',
+//                                 adminData.MobileNumber || 'N/A',
+//                                 mr.MRNAME || 'N/A',
+//                                 mr.MRCODE || 'N/A',
+//                                 mr.HQ || 'N/A',
+//                                 mr.DESG || 'N/A',
+//                                 mr.doc || 'N/A',
+//                                 mr.doctors.length || 'N/A',
+//                                 doctor.DRNAME || 'N/A',
+//                                 doctor.SCCODE || 'N/A',
+//                                 doctor.SPECIALITY || 'N/A',
+//                                 doctor.LOCALITY || 'N/A',
+//                                 doctor.patients ? doctor.patients.length || 'N/A' : 'N/A',
+//                                 doctor.STATE ? doctor.STATE || 'N/A' : 'N/A',
+//                                 patient.PatientName || 'N/A',
+//                                 patient.PatientAge || 'N/A',
+//                                 patient.PatientType || 'N/A',
+//                                 patient.doc || 'N/A',
+//                                 patient.Repurchase ? patient.Repurchase.length || 'N/A' : 'N/A',
+//                                 patient.Repurchase || 'N/A',
+//                             ];
+//                             rows.push(patientRow);
+//                         });
+//                     }
+//                 });
+//             }
+//         }
+
+//         return res.json(rows);
+//     } catch (error) {
+//         console.error(error);
+//         const errMsg = error.message;
+//         return res.status(500).json({ success: false, errMsg, error: 'Internal Server Error' });
+//     }
+// };
 
 const handleAdminSideDetailReports = async (req, res) => {
     const adminId = req.params.id;
@@ -317,10 +416,30 @@ const handleAdminSideDetailReports = async (req, res) => {
     try {
         const adminData = await adminModels
             .findById(adminId)
+            .populate({
+                path: 'Slm',
+                model: 'Slm',
+                populate: {
+                    path: 'Flm',
+                    model: 'Flm',
+                    populate: {
+                        path: 'Mrs',
+                        model: 'MR',
+                        populate: {
+                            path: 'doctors',
+                            model: 'Doctor',
+                            populate: {
+                                path: 'patients',
+                                model: 'Patient'
+                            }
+                        }
+                    }
+                }
+            })
             .lean()
             .exec();
 
-        if (!adminData || !adminData.Mrs) {
+        if (!adminData || !adminData.Slm || adminData.Slm.length === 0) {
             return res.status(404).json({ error: 'Admin not found or has no related data' });
         }
 
@@ -340,7 +459,7 @@ const handleAdminSideDetailReports = async (req, res) => {
             'doctorSpeciality',
             'doctorLocality',
             'doctorTotalPatients',
-            'doctorState',
+            'doctorClass',
             'patientName',
             'patientAge',
             'PatientType',
@@ -351,56 +470,42 @@ const handleAdminSideDetailReports = async (req, res) => {
 
         const rows = [header];
 
-        for (const mrId of adminData.Mrs) {
-            const mr = await MrModel
-                .findById(mrId)
-                .populate({
-                    path: 'doctors',
-                    model: 'Doctor',
-                    populate: {
-                        path: 'patients',
-                        model: 'Patient'
-                    }
-                })
-                .exec();
-            if (!mr) {
-                continue;
-            }
-
-            if (mr.doctors) {
-                mr.doctors.forEach(doctor => {
-                    if (doctor.patients) {
-                        doctor.patients.forEach(patient => {
-                            const patientRow = [
-                                adminData.AdminId || 'N/A',
-                                adminData.Name || 'N/A',
-                                adminData.Gender || 'N/A',
-                                adminData.MobileNumber || 'N/A',
-                                mr.MRNAME || 'N/A',
-                                mr.MRCODE || 'N/A',
-                                mr.HQ || 'N/A',
-                                mr.DESG || 'N/A',
-                                mr.doc || 'N/A',
-                                mr.doctors.length || 'N/A',
-                                doctor.DRNAME || 'N/A',
-                                doctor.SCCODE || 'N/A',
-                                doctor.SPECIALITY || 'N/A',
-                                doctor.LOCALITY || 'N/A',
-                                doctor.patients ? doctor.patients.length || 'N/A' : 'N/A',
-                                doctor.STATE ? doctor.STATE || 'N/A' : 'N/A',
-                                patient.PatientName || 'N/A',
-                                patient.PatientAge || 'N/A',
-                                patient.PatientType || 'N/A',
-                                patient.doc || 'N/A',
-                                patient.Repurchase ? patient.Repurchase.length || 'N/A' : 'N/A',
-                                patient.Repurchase || 'N/A',
-                            ];
-                            rows.push(patientRow);
-                        });
-                    }
+        adminData.Slm.forEach(slm => {
+            slm.Flm.forEach(flm => {
+                flm.Mrs.forEach(mr => {
+                    mr.doctors.forEach(doctor => {
+                        if (doctor.patients) {
+                            doctor.patients.forEach(patient => {
+                                const patientRow = [
+                                    adminData.AdminId || 'N/A',
+                                    adminData.Name || 'N/A',
+                                    adminData.Gender || 'N/A',
+                                    adminData.MobileNumber || 'N/A',
+                                    mr.PSNAME || 'N/A',
+                                    mr.EMPID || 'N/A',
+                                    mr.HQ || 'N/A',
+                                    mr.DESIGNATION || 'N/A',
+                                    mr.doctors.length || 'N/A',
+                                    doctor.DoctorName || 'N/A',
+                                    doctor.SCCode || 'N/A',
+                                    doctor.Specialty || 'N/A',
+                                    doctor.Place || 'N/A',
+                                    doctor.patients ? doctor.patients.length || 'N/A' : 'N/A',
+                                    doctor.CLASS || 'N/A',
+                                    patient.PatientName || 'N/A',
+                                    patient.Age || 'N/A',
+                                    patient.PatientType || 'N/A',
+                                    patient.doc || 'N/A',
+                                    patient.Repurchase ? patient.Repurchase.length || 'N/A' : 'N/A',
+                                    patient.Repurchase || 'N/A',
+                                ];
+                                rows.push(patientRow);
+                            });
+                        }
+                    });
                 });
-            }
-        }
+            });
+        });
 
         return res.json(rows);
     } catch (error) {
@@ -598,12 +703,12 @@ const handleAdminPatientWiseReports = async (req, res) => {
                 console.log(latestRepurchase);
 
                 const formattedReport = {
-                    doctorName: doctor.DRNAME,
-                    doctorMobile: doctor.MOBILENO,
+                    doctorName: doctor.DoctorName,
+                    doctorSpecialty: doctor.Specialty,
                     patientName: patient.PatientName,
                     patientType: patient.PatientType,
                     patientMobileNumber: patient.MobileNumber,
-                    patientAge: patient.PatientAge,
+                    patientAge: patient.Age,
 
                     status: latestRepurchase ? [latestRepurchase] : [],
                 };
@@ -644,15 +749,15 @@ const handleDoctorWisePatientCount = async (req, res) => {
 
             doctors.forEach((doctor) => {
                 const doctorReport = {
-                    DIV: mr.DIV,
-                    STATE: mr.STATE,
-                    MRNAME: mr.MRNAME,
-                    MRCODE: mr.MRCODE,
-                    DOCTORNAME: doctor.DRNAME,
-                    doctorMobile: doctor.MOBILENO,
-                    doctorSccode: doctor.SCCODE,
-                    doctorLocality: doctor.LOCALITY,
-                    doctorState: doctor.STATE,
+                    DESG: mr.DESIGNATION,
+                    REGION: mr.Region,
+                    MRNAME: mr.PSNAME,
+                    MRCODE: mr.EMPID,
+                    DOCTORNAME: doctor.DoctorName,
+                    doctorPotential: doctor.DoctorPotential,
+                    doctorSccode: doctor.SCCode,
+                    doctorLocality: doctor.Place,
+                    doctorSpecialty: doctor.Specialty,
                     totalPatients: doctor.patients.length,
                     totalActivePatients: 0,
                     totalDropouts: 0,
@@ -667,7 +772,7 @@ const handleDoctorWisePatientCount = async (req, res) => {
                     const latestRepurchase = patient.Repurchase.length > 0 ? patient.Repurchase[patient.Repurchase.length - 1] : null;
 
                     if (latestRepurchase) {
-                        if (latestRepurchase.TherapyStatus === 'GOING') {
+                        if (latestRepurchase.TherapyStatus === 'Ongoing') {
                             doctorReport.totalActivePatients++;
                         } else if (latestRepurchase.TherapyStatus === 'Dropped out') {
                             doctorReport.totalDropouts++;
@@ -766,9 +871,10 @@ const handleMrAndPatientReports = async (req, res) => {
                     return count;
                 }, 0);
 
+
                 MrWisePatient.push({
-                    DIV: mr.DIV,
-                    STATE: mr.STATE,
+                    DESG: mr.DESIGNATION,
+                    REGION: mr.Region,
                     MRNAME: mr.MRNAME,
                     MRCODE: mr.MRCODE,
                     totalPatients,
@@ -839,17 +945,17 @@ const handleDetailedReport = async (req, res) => {
                             const brandTotolCartiridgesPurchase = calculateBrandTotolCartiridgesPurchase(patient, brand);
 
                             const reportEntry = {
-                                DIV: mr.DIV,
-                                STATE: mr.STATE,
-                                MRCODE: mr.MRCODE,
-                                MRNAME: mr.MRNAME,
+                                REGION: mr.Region,
+                                MRCODE: mr.EMPID,
+                                MRNAME: mr.PSNAME,
                                 HQ: mr.HQ,
-                                DESG: mr.DESG,
-                                DRNAME: doctor.DRNAME,
-                                MOBILENO: mr.MOBILENO,
+                                DESG: mr.DESIGNATION,
+                                MOBILENO: mr.Number,
+                                DOJ: mr.DOJ,
+                                DRNAME: doctor.DoctorName,
                                 PatientName: patient.PatientName,
                                 MobileNumber: patient.MobileNumber,
-                                PatientAge: patient.PatientAge,
+                                PatientAge: patient.Age,
                                 Brands: brand,
                                 BrandDurationOfTherapy: brandDurationOfTherapy,
                                 BrandTotolCartiridgesPurchase: brandTotolCartiridgesPurchase,
@@ -889,14 +995,14 @@ const PrescriberReport = async (req, res) => {
         mrs.forEach(mr => {
             mr.doctors.forEach(doctor => {
                 const doctorData = {
-                    DIV: mr.DIV,
-                    STATE: mr.STATE,
-                    MRCODE: mr.MRCODE,
-                    MRNAME: mr.MRNAME,
+                    REGION: mr.Region,
+                    MRCODE: mr.EMPID,
+                    MRNAME: mr.PSNAME,
+                    DOJ: mr.DOJ,
                     HQ: mr.HQ,
-                    DESG: mr.DESG,
-                    DRNAME: doctor.DRNAME,
-                    MOBILENO: mr.MOBILENO,
+                    DESG: mr.DESIGNATION,
+                    DRNAME: doctor.DoctorName,
+                    MOBILENO: mr.Number,
                     newPatientsCount: 0,
                     ongoingPatientsCount: 0,
                 };
