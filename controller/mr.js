@@ -61,7 +61,7 @@ const createMr = async (req, res) => {
 const loginMr = async (req, res) => {
     try {
         const { EMPID, Password } = req.body;
-        
+
         const mr = await MrModel.findOne({ EMPID: EMPID });
         if (!mr) {
             return res.status(400).json({
@@ -570,7 +570,7 @@ const mrUpdatePatientStatus = async (req, res) => {
 
 const mrAddNewBrand = async (req, res) => {
     try {
-        const { DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Brands, TherapyStatus } = req.body;
+        const { DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Brands, TherapyStatus, TM } = req.body;
 
         //Check the mrExist or not...
         const mrid = req.params.mrID;
@@ -593,6 +593,7 @@ const mrAddNewBrand = async (req, res) => {
             DateOfPurchase: DateOfPurchase,
             TherapyStatus: TherapyStatus,
             Delivery: Delivery,
+            TM: TM,
             Brands: Brands
         }
 
