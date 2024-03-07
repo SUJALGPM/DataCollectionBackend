@@ -208,7 +208,7 @@ async function getPatientDetails(patientIds) {
 const getAllMR = async (req, res) => {
 
     try {
-        const mrs = await MrModel.find({}).select("_id MRNAME");
+        const mrs = await MrModel.find({}).select("_id PSNAME");
         if (!mrs) return res.status(400);
         return res.json(mrs);
     }
