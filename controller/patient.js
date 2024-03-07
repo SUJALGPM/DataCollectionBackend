@@ -156,7 +156,7 @@ const dataPushToPatient = async (req, res) => {
                 DurationOfTherapy: data.durationOfTherapy,
                 TotolCartiridgesPurchase: data.totalCartridgesPurchase,
                 DateOfPurchase: new Date(data.dop),
-                TherapyStatus: data.therapyStatus,
+                TherapyStatus: data.TherapyStatus,
                 Delivery: data.delivery,
                 TM: data.tm,
                 SubComments: data.subComments,
