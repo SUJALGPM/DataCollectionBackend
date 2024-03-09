@@ -312,6 +312,13 @@ const getPatinetBrands = async (req, res) => {
     }
 }
 
+
+// Function to check if the date is in the expected format "dd-mm-yyyy"
+function isValidDate(dateString) {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+    return dateRegex.test(dateString);
+}
+
 const singlePatientFullDetails = async (req, res) => {
     try {
         const patientId = req.params.id;
@@ -332,7 +339,7 @@ const singlePatientFullDetails = async (req, res) => {
         const patientRepurchaseDetail = patientExist.Repurchase.map(repurchase => ({
             RDURATION: repurchase.DurationOfTherapy,
             RUNITSOLD: repurchase.TotolCartiridgesPurchase,
-            RDATE: repurchase.DateOfPurchase,
+            RDATE: isValidDate(repurchase.DateOfPurchase) ? repurchase.DateOfPurchase : new Date(repurchase.DateOfPurchase).toLocaleDateString('en-GB'),
             RSTATUS: repurchase.TherapyStatus
         }));
 
@@ -366,7 +373,6 @@ const singlePatientFullDetails = async (req, res) => {
         console.log(err);
     }
 }
-
 
 
 module.exports = {
