@@ -64,7 +64,7 @@ const moment = require('moment');
 
 const createPatients = async (req, res) => {
     try {
-        const { PatientName, MobileNumber, Gender, Location, Indication, UnitsPrescribe, NoUnitPurchased, Price, PatientAge, NoDose, Reason, PatientType, Month, Year, PatientStatus, DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Demo, TherapyStatus, TM, selectedOptions, brandCount, repurchaseData } = req.body
+        const { PatientName, MobileNumber, Gender, Location, UnitsPrescribe, NoUnitPurchased, Price, PatientAge, NoDose, Reason, PatientType, Month, Year, PatientStatus, DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Demo, TherapyStatus, TM, selectedOptions, brandCount, repurchaseData } = req.body
         const id = req.params['id'];
 
         //Check the doctor exist or not....
@@ -76,7 +76,9 @@ const createPatients = async (req, res) => {
 
         //Check the MR exist or not...
         const mrExist = await MrModel.findOne({ doctors: doctor });
-        console.log("Mr detail :", mrExist);
+        if (!mrExist) {
+            return res.status(404).send({ message: "MR Not Found...!!!", success: false });
+        }
 
         // const brands = selectedOptions.map(brand => brand.value);
         const patient = new PatientModel({
@@ -85,10 +87,7 @@ const createPatients = async (req, res) => {
             Age: PatientAge,
             Gender: Gender,
             Location: Location,
-            Indication: Indication,
             UnitsPrescribe: UnitsPrescribe,
-            Price: Price,
-            NoDose: NoDose,
             NoUnitPurchased: NoUnitPurchased,
             Month: Month,
             Year: Year,
@@ -102,7 +101,7 @@ const createPatients = async (req, res) => {
         //Repurchase data handle...
         repurchaseData.forEach(data => {
             const selectedBrand = data.selectedBrand ? data.selectedBrand.value : null;
-            const CalculateTotal = Price * NoDose;
+            const calculatedTotal = data.Price * data.NoDose;
             patient.Repurchase.push({
                 DurationOfTherapy: data.durationOfTherapy,
                 TotolCartiridgesPurchase: data.totalCartridgesPurchase,
@@ -111,8 +110,11 @@ const createPatients = async (req, res) => {
                 TherapyStatus: data.therapyStatus,
                 Delivery: data.delivery,
                 TM: data.tm,
+                Indication: data.Indication,
+                Price: data.Price,
+                NoDose: data.NoDose,
                 SubComments: data.subComments,
-                Total: CalculateTotal,
+                Total: calculatedTotal,
                 Brands: [selectedBrand]
             });
         });
@@ -124,6 +126,20 @@ const createPatients = async (req, res) => {
         //Save the new doctor....
         doctor.patients.push(savedPatient._id);
         await doctor.save();
+
+        // Track the repurchase data to MR Model...
+        repurchaseData.forEach(data => {
+            const repurchaseEntry = {
+                DoctorName: doctor.DoctorName,
+                PatientName: patient.PatientName,
+                repurchaseData: {
+                    ...data,
+                    Total: data.Price * data.NoDose
+                }
+            };
+            mrExist.repurchaseLogs.push(repurchaseEntry);
+        });
+        await mrExist.save();
 
         //Send the response....
         return res.status(201).json({ success: true, message: 'Patient created and associated with Doctor' });
