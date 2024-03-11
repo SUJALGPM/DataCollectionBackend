@@ -11,6 +11,7 @@ const fs = require("fs");
 const csv = require('csv-parser');
 const xlsx = require('xlsx');
 const patient = require('../models/patient');
+const { format } = require('path');
 
 const createMr = async (req, res) => {
     try {
@@ -619,7 +620,7 @@ const mrUpdatePatientStatus = async (req, res) => {
 
 const mrAddNewBrand = async (req, res) => {
     try {
-        const { DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, EndOfPurchase, Delivery, Brands, TherapyStatus, TM } = req.body;
+        const { DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, EndOfPurchase, Delivery, Brands, TherapyStatus, TM, UnitsPrescribe, Indication, Price, NoDose, SubComments } = req.body;
 
         //Check the mrExist or not...
         const mrid = req.params.mrID;
@@ -635,6 +636,15 @@ const mrAddNewBrand = async (req, res) => {
             return res.status(404).send({ message: "Patient not found..!!!", success: false });
         }
 
+        //Check the doctor exist or not...
+        const doctorExist = await DoctorModel.findOne({ patients: patientExist });
+        if (!doctorExist) {
+            return res.status(404).send({ message: "Doctor Not Found..!!" });
+        }
+
+        //Calculated total...
+        const calculateTotal = Price * NoDose;
+
         //Format data before uploading....
         const formData = {
             DurationOfTherapy: DurationOfTherapy,
@@ -644,12 +654,29 @@ const mrAddNewBrand = async (req, res) => {
             TherapyStatus: TherapyStatus,
             Delivery: Delivery,
             TM: TM,
+            UnitsPrescribe: UnitsPrescribe,
+            Indication: Indication,
+            Price: Price,
+            NoDose: NoDose,
+            Total: calculateTotal,
+            SubComments: SubComments,
             Brands: Brands
         }
 
         //Push the new Repurchase data...
         patientExist.Repurchase.push(formData);
         await patientExist.save();
+
+        //Format data before log..
+        const formatedData = {
+            DoctorName: doctorExist.DoctorName,
+            PatientName: patientExist.PatientName,
+            repurchaseData: formData
+        }
+
+        //Track the record of usage...
+        mrExist.repurchaseLogs.push(formatedData);
+        mrExist.save();
 
         //Check the response...
         res.status(201).send({ message: "MR Successfully added new brand in patient...", success: true });
