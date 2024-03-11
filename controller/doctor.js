@@ -27,10 +27,14 @@ const createDoctor = async (req, res) => {
         if (mr) {
             mr.doctors.push(savedDoctor._id);
             await mr.save();
+
+            //Track the new created doctors to MrModel...
+            mr.doctorLogs.push(savedDoctor);
+            await mr.save();
         } else {
             return res.status(404).json({ success: false, message: 'MR not found' });
         }
-        
+
         return res.status(201).json({ success: true, message: 'Doctor created and associated with MR' });
     }
     catch (error) {
@@ -90,7 +94,6 @@ const getDoctorById = async (req, res) => {
         });
     }
 }
-
 
 const getMrReports = async (req, res) => {
     const { mrId } = req.params;
