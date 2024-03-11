@@ -1165,6 +1165,9 @@ const uplaodSheet = async (req, res) => {
                     patientStatus = false;
                 }
 
+                //Calculation of total..
+                const calculateTotal = row.Price * row.NoDose;
+
                 // Extract age from the row data and parse it as an integer
                 const age = parseInt(row['Age ']);
 
@@ -1175,10 +1178,6 @@ const uplaodSheet = async (req, res) => {
                     Gender: row.Gender,
                     MobileNumber: row.MobileNumber,
                     Location: row.Location,
-                    Indication: row.Indication,
-                    UnitsPrescribe: row.UnitsPrescribe,
-                    Price: row.Price,
-                    NoDose: row.NoDose,
                     // NoUnitPurchased: row.NoUnitPurchased,
                     Month: row.Month,
                     Year: row.Year,
@@ -1192,7 +1191,12 @@ const uplaodSheet = async (req, res) => {
                         DateOfPurchase: row.DateOfPurchase,
                         Delivery: row.Delivery,
                         TherapyStatus: row.TherapyStatus,
-                        Brands: row.Brands // Assuming row.Brands is an array
+                        UnitsPrescribe: row.UnitsPrescribe,
+                        Indication: row.row.Indication,
+                        Price: row.Price,
+                        NoDose: row.NoDose,
+                        Total: calculateTotal,
+                        Brands: row.Brands
                     }
                 });
                 await existingPatient.save();

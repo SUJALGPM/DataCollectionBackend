@@ -75,7 +75,6 @@ const getAllDoctors = async (req, res) => {
     }
 }
 
-
 const getDoctorById = async (req, res) => {
     try {
         const { id } = req.params
