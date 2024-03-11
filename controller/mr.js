@@ -76,7 +76,7 @@ const loginMr = async (req, res) => {
                 });
                 await mr.save();
                 return res.status(200).json({
-                    msg: "Login Done",
+                    msg: "Login Success",
                     success: true,
                     mr
                 })
@@ -490,11 +490,39 @@ const getMrBrandSummary = async (req, res) => {
     }
 }
 
+// const getMrPatients = async (req, res) => {
+//     try {
+//         const mrId = req.params.id;
+//         const mrDet = await MrModel.findById(mrId).populate('doctors');
+
+
+//         // Array to store all patients
+//         let allPatients = [];
+
+//         // Iterate over doctors
+//         for (const doctor of mrDet.doctors) {
+//             // Fetch patients for this doctor
+//             const patients = await PatientModel.find({ _id: { $in: doctor.patients } });
+
+//             // Push patients to allPatients array
+//             allPatients.push(...patients.map(patient => ({
+//                 doctorName: doctor.DoctorName,
+//                 patientDetails: patient
+//             })));
+//         }
+
+//         // Sending response with all patients
+//         res.status(200).json(allPatients);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// }
+
 const getMrPatients = async (req, res) => {
     try {
         const mrId = req.params.id;
         const mrDet = await MrModel.findById(mrId).populate('doctors');
-
 
         // Array to store all patients
         let allPatients = [];
@@ -505,17 +533,38 @@ const getMrPatients = async (req, res) => {
             const patients = await PatientModel.find({ _id: { $in: doctor.patients } });
 
             // Push patients to allPatients array
-            allPatients.push(...patients.map(patient => ({
-                doctorName: doctor.DoctorName,
-                patientDetails: patient
-            })));
+            for (const patient of patients) {
+                for (const repurchase of patient.Repurchase) {
+                    const patientData = {
+                        PatientName: patient.PatientName,
+                        MobileNumber: patient.MobileNumber,
+                        Age: patient.Age,
+                        Gender: patient.Gender,
+                        Location: patient.Location,
+                        Indication: patient.Indication,
+                        UnitsPrescribe: patient.UnitsPrescribe,
+                        Price: patient.Price,
+                        NoDose: patient.NoDose,
+                        Month: patient.Month,
+                        DurationOfTherapy: repurchase.DurationOfTherapy,
+                        TotolCartiridgesPurchase: repurchase.TotolCartiridgesPurchase,
+                        DateOfPurchase: repurchase.DateOfPurchase,
+                        TherapyStatus: repurchase.TherapyStatus,
+                        Delivery: repurchase.Delivery,
+                        TM: repurchase.TM,
+                        SubComments: repurchase.SubComments,
+                        brandName: repurchase.Brands.join(", ")
+                    };
+                    allPatients.push(patientData);
+                }
+            }
         }
 
         // Sending response with all patients
         res.status(200).json(allPatients);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal server error' }); // Sending error response
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
 
@@ -610,105 +659,6 @@ const mrAddNewBrand = async (req, res) => {
     }
 };
 
-//Exiting Api response issue..
-// const mrGetDataBrandWise = async (req, res) => {
-
-//     try {
-//         const mrId = req.params.mrId;
-
-//         const mrWithDoctors = await MrModel.findOne({ _id: mrId }).populate({
-//             path: 'doctors',
-//             populate: {
-//                 path: 'patients',
-//             },
-//         });
-
-//         if (!mrWithDoctors) {
-//             return res.status(404).json({ message: 'MR not found' });
-//         }
-
-//         const brandNames = ['TOFASHINE', 'INFIMAB', 'HEADON'];
-
-//         const totalCounts = {
-//             totalDoctor: mrWithDoctors.doctors.length,
-//             totalallbrandsPatientCount: 0,
-//             totalRepurchaseCount: 0,
-//         };
-
-//         const brandStats = {};
-
-//         mrWithDoctors.doctors.forEach((doctor) => {
-//             brandNames.forEach((brandName) => {
-//                 const activePatientCount = doctor.patients.filter((patient) =>
-//                     patient.Repurchase.some(
-//                         (purchase) =>
-//                             purchase.Brands &&
-//                             Array.isArray(purchase.Brands) &&
-//                             purchase.Brands.includes(brandName) &&
-//                             patient.PatientStatus === true
-//                     )
-//                 ).length;
-
-//                 const inactivePatientCount = doctor.patients.filter((patient) =>
-//                     patient.Repurchase.some(
-//                         (purchase) =>
-//                             purchase.Brands &&
-//                             Array.isArray(purchase.Brands) &&
-//                             purchase.Brands.includes(brandName) &&
-//                             patient.PatientStatus === false
-//                     )
-//                 ).length;
-
-//                 const totalRepurchaseCount = doctor.patients.reduce((count, patient) => {
-//                     const repurchaseCount = patient.Repurchase.reduce(
-//                         (repCount, purchase) =>
-//                             purchase.Brands &&
-//                                 Array.isArray(purchase.Brands) &&
-//                                 purchase.Brands.includes(brandName)
-//                                 ? repCount + 1
-//                                 : repCount,
-//                         0
-//                     );
-
-//                     return count + repurchaseCount;
-//                 }, 0);
-
-//                 const TotalPatientCount = activePatientCount + inactivePatientCount;
-
-//                 // Update total counts
-//                 totalCounts.totalallbrandsPatientCount += TotalPatientCount;
-//                 totalCounts.totalRepurchaseCount += totalRepurchaseCount;
-
-//                 // Update brand-specific stats
-//                 if (!brandStats[brandName]) {
-//                     brandStats[brandName] = {
-//                         totalPatientCount: 0,
-//                         activePatientCount: 0,
-//                         inactivePatientCount: 0,
-//                         totalRepurchaseCount: 0,
-//                     };
-//                 }
-
-//                 brandStats[brandName].totalPatientCount += TotalPatientCount;
-//                 brandStats[brandName].activePatientCount += activePatientCount;
-//                 brandStats[brandName].inactivePatientCount += inactivePatientCount;
-//                 brandStats[brandName].totalRepurchaseCount += totalRepurchaseCount;
-//             });
-//         });
-
-//         // Include total counts and brand-specific stats in the response
-//         const responseData = {
-//             ...totalCounts,
-//             ...brandStats,
-//         };
-
-//         res.json(responseData);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Internal Server Error' });
-//     }
-
-// };
 
 const mrGetDataBrandWise = async (req, res) => {
     try {
@@ -892,6 +842,9 @@ const mrGetDoctorBrandWise = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch the data brand-wise", success: false });
     }
 }
+
+
+
 
 module.exports = {
     createMr,

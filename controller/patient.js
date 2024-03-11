@@ -318,7 +318,6 @@ function isValidDate(dateString) {
     const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
     return dateRegex.test(dateString);
 }
-
 const singlePatientFullDetails = async (req, res) => {
     try {
         const patientId = req.params.id;
@@ -340,7 +339,8 @@ const singlePatientFullDetails = async (req, res) => {
             RDURATION: repurchase.DurationOfTherapy,
             RUNITSOLD: repurchase.TotolCartiridgesPurchase,
             RDATE: isValidDate(repurchase.DateOfPurchase) ? repurchase.DateOfPurchase : new Date(repurchase.DateOfPurchase).toLocaleDateString('en-GB'),
-            RSTATUS: repurchase.TherapyStatus
+            RSTATUS: repurchase.TherapyStatus,
+            RBRANDNAME: repurchase.Brands
         }));
 
         // //Iterate the patient Brand Usage...
