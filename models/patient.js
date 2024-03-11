@@ -17,8 +17,6 @@ const PatientSchema = new mongoose.Schema({
     Age: Number,
     Gender: String,
     Location: String,
-    UnitsPrescribe: Number,
-    NoUnitPurchased: String,
     Month: String,
     Year: Number,
     PatientStatus: {
@@ -55,6 +53,7 @@ const PatientSchema = new mongoose.Schema({
             type: String,
             default: ""
         },
+        UnitsPrescribe: Number,
         Indication: String,
         Price: Number,
         NoDose: String,

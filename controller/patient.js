@@ -64,7 +64,7 @@ const moment = require('moment');
 
 const createPatients = async (req, res) => {
     try {
-        const { PatientName, MobileNumber, Gender, Location, UnitsPrescribe, NoUnitPurchased, Price, PatientAge, NoDose, Reason, PatientType, Month, Year, PatientStatus, DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Demo, TherapyStatus, TM, selectedOptions, brandCount, repurchaseData } = req.body
+        const { PatientName, MobileNumber, Gender, Location, PatientAge, Reason, PatientType, Month, Year, PatientStatus, DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Demo, TherapyStatus, TM, selectedOptions, brandCount, repurchaseData } = req.body
         const id = req.params['id'];
 
         //Check the doctor exist or not....
@@ -87,8 +87,6 @@ const createPatients = async (req, res) => {
             Age: PatientAge,
             Gender: Gender,
             Location: Location,
-            UnitsPrescribe: UnitsPrescribe,
-            NoUnitPurchased: NoUnitPurchased,
             Month: Month,
             Year: Year,
             PatientStatus: PatientStatus === 'DISCONTINUE' ? false : true,
@@ -110,6 +108,7 @@ const createPatients = async (req, res) => {
                 TherapyStatus: data.therapyStatus,
                 Delivery: data.delivery,
                 TM: data.tm,
+                UnitsPrescribe: data.UnitsPrescribe,
                 Indication: data.Indication,
                 Price: data.Price,
                 NoDose: data.NoDose,
