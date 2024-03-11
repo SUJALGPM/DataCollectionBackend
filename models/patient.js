@@ -33,7 +33,7 @@ const PatientSchema = new mongoose.Schema({
     doc: Date,
     Repurchase: [{
         DurationOfTherapy: {
-            type: Number,   
+            type: Number,
             default: 6
         },
         TotolCartiridgesPurchase: {
@@ -41,6 +41,7 @@ const PatientSchema = new mongoose.Schema({
             default: 3
         },
         DateOfPurchase: String,
+        EndOfPurchase: String,
         TherapyStatus: {
             type: String,
             default: "Ongoing"
@@ -54,6 +55,10 @@ const PatientSchema = new mongoose.Schema({
             default: ""
         },
         SubComments: {
+            type: String,
+            default: ""
+        },
+        Total: {
             type: String,
             default: ""
         },

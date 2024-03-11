@@ -1,6 +1,7 @@
 const DoctorModel = require("../models/doctor");
 const PatientModel = require("../models/patient");
-const BrandModel = require("../models/Brands")
+const BrandModel = require("../models/Brands");
+const MrModel = require("../models/mr");
 const moment = require('moment');
 
 
@@ -60,19 +61,24 @@ const moment = require('moment');
 //     }
 // }
 
+
 const createPatients = async (req, res) => {
     try {
         const { PatientName, MobileNumber, Gender, Location, Indication, UnitsPrescribe, NoUnitPurchased, Price, PatientAge, NoDose, Reason, PatientType, Month, Year, PatientStatus, DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Demo, TherapyStatus, TM, selectedOptions, brandCount, repurchaseData } = req.body
         const id = req.params['id'];
-        const dateFormat = moment(DateOfPurchase, 'DD/MM/YYYY', true);
+
+        //Check the doctor exist or not....
         const doctor = await DoctorModel.findById({ _id: id });
         if (!doctor) return res.status(400).json({
             msg: "Doctor is Not Found",
             success: false
         });
 
-        // const brands = selectedOptions.map(brand => brand.value);
+        //Check the MR exist or not...
+        const mrExist = await MrModel.findOne({ doctors: doctor });
+        console.log("Mr detail :", mrExist);
 
+        // const brands = selectedOptions.map(brand => brand.value);
         const patient = new PatientModel({
             PatientName: PatientName,
             MobileNumber: MobileNumber,
@@ -93,28 +99,33 @@ const createPatients = async (req, res) => {
         });
 
 
-
+        //Repurchase data handle...
         repurchaseData.forEach(data => {
             const selectedBrand = data.selectedBrand ? data.selectedBrand.value : null;
+            const CalculateTotal = Price * NoDose;
             patient.Repurchase.push({
                 DurationOfTherapy: data.durationOfTherapy,
                 TotolCartiridgesPurchase: data.totalCartridgesPurchase,
                 DateOfPurchase: new Date(data.dop),
+                EndOfPurchase: new Date(data.eop),
                 TherapyStatus: data.therapyStatus,
                 Delivery: data.delivery,
                 TM: data.tm,
                 SubComments: data.subComments,
+                Total: CalculateTotal,
                 Brands: [selectedBrand]
             });
         });
 
+        //Save the new patient...
         await patient.save();
-
         const savedPatient = await patient.save();
 
+        //Save the new doctor....
         doctor.patients.push(savedPatient._id);
         await doctor.save();
 
+        //Send the response....
         return res.status(201).json({ success: true, message: 'Patient created and associated with Doctor' });
 
     } catch (error) {
@@ -156,6 +167,7 @@ const dataPushToPatient = async (req, res) => {
                 DurationOfTherapy: data.durationOfTherapy,
                 TotolCartiridgesPurchase: data.totalCartridgesPurchase,
                 DateOfPurchase: new Date(data.dop),
+                EndOfPurchase: new Date(data.eop),
                 TherapyStatus: data.TherapyStatus,
                 Delivery: data.delivery,
                 TM: data.tm,
@@ -340,6 +352,7 @@ const singlePatientFullDetails = async (req, res) => {
             RUNITSOLD: repurchase.TotolCartiridgesPurchase,
             RDATE: isValidDate(repurchase.DateOfPurchase) ? repurchase.DateOfPurchase : new Date(repurchase.DateOfPurchase).toLocaleDateString('en-GB'),
             RSTATUS: repurchase.TherapyStatus,
+            RTOTAL: repurchase.Total,
             RBRANDNAME: repurchase.Brands
         }));
 

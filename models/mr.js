@@ -49,6 +49,7 @@ const mrSchema = new mongoose.Schema({
             },
         },
     ],
+    repurchaseLogs: [],
     doctors: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' }
     ]

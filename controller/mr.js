@@ -619,7 +619,7 @@ const mrUpdatePatientStatus = async (req, res) => {
 
 const mrAddNewBrand = async (req, res) => {
     try {
-        const { DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Brands, TherapyStatus, TM } = req.body;
+        const { DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, EndOfPurchase, Delivery, Brands, TherapyStatus, TM } = req.body;
 
         //Check the mrExist or not...
         const mrid = req.params.mrID;
@@ -640,6 +640,7 @@ const mrAddNewBrand = async (req, res) => {
             DurationOfTherapy: DurationOfTherapy,
             TotolCartiridgesPurchase: TotolCartiridgesPurchase,
             DateOfPurchase: DateOfPurchase,
+            EndOfPurchase: EndOfPurchase,
             TherapyStatus: TherapyStatus,
             Delivery: Delivery,
             TM: TM,
@@ -658,7 +659,6 @@ const mrAddNewBrand = async (req, res) => {
         res.status(500).send({ message: "Failed to add new brand with repurchase data in patient..!!", success: false });
     }
 };
-
 
 const mrGetDataBrandWise = async (req, res) => {
     try {
