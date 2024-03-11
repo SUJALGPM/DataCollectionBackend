@@ -364,6 +364,11 @@ const singlePatientFullDetails = async (req, res) => {
             PCITY: patientExist.Location,
             PAGE: patientExist.Age,
             PSTATUS: patientExist.PatientStatus,
+            PGENDER: patientExist.Gender,
+            PINDICATION: patientExist.Indication,
+            PPRICE: patientExist.Price,
+            PNODOSE: patientExist.NoDose,
+            PREASON: patientExist.Reason,
             PBRAND: patientBrandDetail,
             PREPURCHASE: patientRepurchaseDetail
         }
@@ -373,6 +378,9 @@ const singlePatientFullDetails = async (req, res) => {
         console.log(err);
     }
 }
+
+
+
 
 
 module.exports = {
