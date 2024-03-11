@@ -171,7 +171,7 @@ const dataPushToPatient = async (req, res) => {
         await mrExist.save();
 
         //Send rsponse if all ok....
-        return res.status(201).send({ message: "New Repurchase add successfully..." });
+        return res.json(200);
 
     } catch (error) {
         const err = error.message
