@@ -690,6 +690,115 @@ const mrAddNewBrand = async (req, res) => {
     }
 };
 
+// const mrGetDataBrandWise = async (req, res) => {
+//     try {
+//         const mrId = req.params.mrId;
+
+//         const mrWithDoctors = await MrModel.findOne({ _id: mrId }).populate({
+//             path: 'doctors',
+//             populate: {
+//                 path: 'patients',
+//             },
+//         });
+
+//         if (!mrWithDoctors) {
+//             return res.status(404).json({ message: 'MR not found' });
+//         }
+
+
+//         const brandNames = [];
+
+//         //Get the brandName .....
+//         const brandNameGet = await brandModel.find({}).select('BrandName');
+//         for (const brand of brandNameGet) {
+//             brandNames.push(brand.BrandName);
+//         }
+
+//         console.log("BNames :", brandNames);
+
+
+//         const totalCounts = {
+//             totalDoctor: mrWithDoctors.doctors.length,
+//             totalallbrandsPatientCount: 0,
+//             totalRepurchaseCount: 0,
+//         };
+
+//         const brandStats = {};
+
+//         mrWithDoctors.doctors.forEach((doctor) => {
+//             brandNames.forEach((brandName) => {
+//                 const activePatientCount = doctor.patients.filter((patient) =>
+//                     patient.Repurchase.some(
+//                         (purchase) =>
+//                             purchase.Brands &&
+//                             Array.isArray(purchase.Brands) &&
+//                             purchase.Brands.includes(brandName) &&
+//                             patient.PatientStatus === true
+//                     )
+//                 ).length;
+
+//                 const inactivePatientCount = doctor.patients.filter((patient) =>
+//                     patient.Repurchase.some(
+//                         (purchase) =>
+//                             purchase.Brands &&
+//                             Array.isArray(purchase.Brands) &&
+//                             purchase.Brands.includes(brandName) &&
+//                             patient.PatientStatus === false
+//                     )
+//                 ).length;
+
+//                 const totalRepurchaseCount = doctor.patients.reduce((count, patient) => {
+//                     const repurchaseCount = patient.Repurchase.reduce(
+//                         (repCount, purchase) =>
+//                             purchase.Brands &&
+//                                 Array.isArray(purchase.Brands) &&
+//                                 purchase.Brands.includes(brandName)
+//                                 ? repCount + 1
+//                                 : repCount,
+//                         0
+//                     );
+
+//                     return count + repurchaseCount;
+//                 }, 0);
+
+//                 const TotalPatientCount = activePatientCount + inactivePatientCount;
+
+//                 // Update total counts
+//                 totalCounts.totalallbrandsPatientCount += TotalPatientCount;
+//                 totalCounts.totalRepurchaseCount += totalRepurchaseCount;
+
+//                 // Update brand-specific stats
+//                 if (!brandStats[brandName]) {
+//                     brandStats[brandName] = {
+//                         totalPatientCount: 0,
+//                         activePatientCount: 0,
+//                         inactivePatientCount: 0,
+//                         totalRepurchaseCount: 0,
+//                     };
+//                 }
+
+//                 brandStats[brandName].totalPatientCount += TotalPatientCount;
+//                 brandStats[brandName].activePatientCount += activePatientCount;
+//                 brandStats[brandName].inactivePatientCount += inactivePatientCount;
+//                 brandStats[brandName].totalRepurchaseCount += totalRepurchaseCount;
+//             });
+//         });
+
+//         // Include total counts and brand-specific stats in the response
+//         const responseData = {
+//             ...totalCounts,
+//             brands: Object.keys(brandStats).map((brandName) => ({
+//                 [brandName]: brandStats[brandName],
+//             })),
+//         };
+
+//         res.json(responseData);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Internal Server Error' });
+//     }
+// };
+
 const mrGetDataBrandWise = async (req, res) => {
     try {
         const mrId = req.params.mrId;
@@ -705,7 +814,12 @@ const mrGetDataBrandWise = async (req, res) => {
             return res.status(404).json({ message: 'MR not found' });
         }
 
-        const brandNames = ['TOFASHINE', 'INFIMAB', 'HEADON'];
+        const brandNames = [];
+
+        const brandNameGet = await brandModel.find({}).select('BrandName');
+        for (const brand of brandNameGet) {
+            brandNames.push(brand.BrandName);
+        }
 
         const totalCounts = {
             totalDoctor: mrWithDoctors.doctors.length,
@@ -714,6 +828,12 @@ const mrGetDataBrandWise = async (req, res) => {
         };
 
         const brandStats = {};
+
+        const doctorCounts = {
+            INFIMABDoctor: 0,
+            TOFASHINEDoctor: 0,
+            HEADONDoctor: 0,
+        };
 
         mrWithDoctors.doctors.forEach((doctor) => {
             brandNames.forEach((brandName) => {
@@ -753,11 +873,9 @@ const mrGetDataBrandWise = async (req, res) => {
 
                 const TotalPatientCount = activePatientCount + inactivePatientCount;
 
-                // Update total counts
                 totalCounts.totalallbrandsPatientCount += TotalPatientCount;
                 totalCounts.totalRepurchaseCount += totalRepurchaseCount;
 
-                // Update brand-specific stats
                 if (!brandStats[brandName]) {
                     brandStats[brandName] = {
                         totalPatientCount: 0,
@@ -772,14 +890,71 @@ const mrGetDataBrandWise = async (req, res) => {
                 brandStats[brandName].inactivePatientCount += inactivePatientCount;
                 brandStats[brandName].totalRepurchaseCount += totalRepurchaseCount;
             });
+
+            // Update doctor counts
+            if (doctor.patients.some((patient) => patient.Repurchase.some((purchase) => purchase.Brands.includes('INFIMAB')))) {
+                doctorCounts.INFIMABDoctor += 1;
+            }
+
+            if (doctor.patients.some((patient) => patient.Repurchase.some((purchase) => purchase.Brands.includes('TOFASHINE')))) {
+                doctorCounts.TOFASHINEDoctor += 1;
+            }
+
+            if (doctor.patients.some((patient) => patient.Repurchase.some((purchase) => purchase.Brands.includes('HEADON')))) {
+                doctorCounts.HEADONDoctor += 1;
+            }
         });
 
-        // Include total counts and brand-specific stats in the response
         const responseData = {
-            ...totalCounts,
-            brands: Object.keys(brandStats).map((brandName) => ({
-                [brandName]: brandStats[brandName],
-            })),
+            totalDoctor: totalCounts.totalDoctor,
+            totalallbrandsPatientCount: totalCounts.totalallbrandsPatientCount,
+            totalRepurchaseCount: totalCounts.totalRepurchaseCount,
+            brands: brandNames.map((brandName) => {
+                const brandData = brandStats[brandName];
+                const brandTotolCartiridgesPurchase = mrWithDoctors.doctors.reduce(
+                    (count, doctor) => {
+                        const hasPatientWithBrand = doctor.patients.some(
+                            (patient) =>
+                                patient.Repurchase.some(
+                                    (purchase) =>
+                                        purchase.Brands &&
+                                        Array.isArray(purchase.Brands) &&
+                                        purchase.Brands.includes(brandName)
+                                ) && patient.PatientStatus === true
+                        );
+
+                        return (
+                            count +
+                            doctor.patients.reduce((purchaseCount, patient) => {
+                                return (
+                                    purchaseCount +
+                                    patient.Repurchase.reduce(
+                                        (brandCount, repurchase) =>
+                                            repurchase.Brands &&
+                                                Array.isArray(repurchase.Brands) &&
+                                                repurchase.Brands.includes(brandName)
+                                                ? brandCount + repurchase.TotolCartiridgesPurchase
+                                                : brandCount,
+                                        0
+                                    )
+                                );
+                            }, 0)
+                        );
+                    },
+                    0
+                );
+
+                return {
+                    [brandName]: {
+                        totalPatientCount: brandData.totalPatientCount,
+                        activePatientCount: brandData.activePatientCount,
+                        inactivePatientCount: brandData.inactivePatientCount,
+                        totalRepurchaseCount: brandData.totalRepurchaseCount,
+                        [`${brandName}TotolCartiridgesPurchase`]: brandTotolCartiridgesPurchase,
+                    },
+                };
+            }),
+            ...doctorCounts,
         };
 
         res.json(responseData);
@@ -993,7 +1168,6 @@ const mrGetScheduleData = async (req, res) => {
 
 }
 
-
 //Final Automatic APIs.......Patient-Status-Update................
 // const mrUpdatePatientStatus = async () => {
 //     try {
@@ -1073,9 +1247,6 @@ const mrUpdatePatientStatus = async () => {
     // }
 };
 setTimeout(mrUpdatePatientStatus, 30 * 1000);
-
-
-
 
 
 module.exports = {
