@@ -1192,7 +1192,7 @@ const uplaodSheet = async (req, res) => {
                         Delivery: row.Delivery,
                         TherapyStatus: row.TherapyStatus,
                         UnitsPrescribe: row.UnitsPrescribe,
-                        Indication: row.row.Indication,
+                        Indication: row.Indication,
                         Price: row.Price,
                         NoDose: row.NoDose,
                         Total: calculateTotal,

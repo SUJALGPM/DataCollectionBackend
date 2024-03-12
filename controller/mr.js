@@ -521,7 +521,6 @@ const getMrBrandSummary = async (req, res) => {
 //     }
 // }
 
-
 const getMrPatients = async (req, res) => {
     try {
         const mrId = req.params.id;
@@ -549,6 +548,7 @@ const getMrPatients = async (req, res) => {
                         Price: patient.Price,
                         NoDose: patient.NoDose,
                         Month: patient.Month,
+                        Status: patient.PatientStatus,
                         DurationOfTherapy: repurchase.DurationOfTherapy,
                         TotolCartiridgesPurchase: repurchase.TotolCartiridgesPurchase,
                         DateOfPurchase: repurchase.DateOfPurchase,
@@ -620,7 +620,6 @@ const getMrPatients = async (req, res) => {
 //         res.status(500).send({ message: "Failed to update the patient Status..!!!", success: false });
 //     }
 // }
-
 
 const mrAddNewBrand = async (req, res) => {
     try {
@@ -996,41 +995,84 @@ const mrGetScheduleData = async (req, res) => {
 
 
 //Final Automatic APIs.......Patient-Status-Update................
+// const mrUpdatePatientStatus = async () => {
+//     try {
+//         // Define patientNewStatus directly within the function
+//         const patientNewStatus = "DISCONTINUE";
+
+//         // Find all patients
+//         const allPatients = await PatientModel.find();
+
+//         // Update the status of patients
+//         for (const patient of allPatients) {
+
+//             //Previous status of patient...
+//             const previousStatus = patient.PatientStatus;
+
+
+//             //Auto time increment logic...
+//             const lastEndOfPurchase = moment(patient.Repurchase.EndOfPurchase);
+//             console.log("Previous Date EOP:", lastEndOfPurchase);
+
+//             const updatedEndOfPurchase = lastEndOfPurchase.add(30, 'seconds').toDate();
+//             console.log("Updated Date EOP:", updatedEndOfPurchase);
+
+
+//             // Set patient status to inactive if updatedEndOfPurchase is in the past
+//             patient.PatientStatus = updatedEndOfPurchase <= new Date() ? true : false;
+//             // patient.PatientStatus = updatedEndOfPurchase <= new Date() ? false : true;
+//             await patient.save();
+
+//             // Print or log patient information
+//             console.log(`Patient ${patient.PatientName} status updated from ${previousStatus} to ${patient.PatientStatus}`);
+//         }
+
+//         console.log(`Updated status for all patients.`);
+//     } catch (err) {
+//         console.error('Error updating patient status:', err);
+//     }
+// };
+// // Schedule the function to run once after a delay of 30 seconds
+// setTimeout(mrUpdatePatientStatus, 30 * 1000);
+
 
 const mrUpdatePatientStatus = async () => {
-    try {
-        // Define patientNewStatus directly within the function
-        const patientNewStatus = "DISCONTINUE"; // or "CONTINUING" depending on your requirement
+    // try {
+    //     // Define patientNewStatus directly within the function
+    //     const patientNewStatus = "DISCONTINUE";
 
-        // Find patients whose last repurchase was more than 30 seconds ago
-        const patientsToUpdate = await PatientModel.find({
-            "Repurchase.EndOfPurchase": {
-                $lte: moment().subtract(30, 'seconds').toISOString()
-            }
-        });
+    //     // Find all patients
+    //     const allPatients = await PatientModel.find();
 
-        // Update the status of found patients
-        for (const patient of patientsToUpdate) {
-            const previousStatus = patient.PatientStatus;
-            // Set patient status to inactive if patientNewStatus is "DISCONTINUE"
-            patient.PatientStatus = patientNewStatus === "DISCONTINUE" ? false : true;
-            await patient.save();
+    //     // Update the status of patients
+    //     for (const patient of allPatients) {
 
-            // Print or log patient information
-            console.log(`Patient ${patient.PatientName} status updated from ${previousStatus} to ${patient.PatientStatus}`);
-        }
+    //         //Previous status of patient...
+    //         const previousStatus = patient.PatientStatus;
 
-        console.log(`Updated status for ${patientsToUpdate.length} patients.`);
-    } catch (err) {
-        console.error('Error updating patient status:', err);
-    }
+    //         //Auto time increment logic...
+    //         const lastEndOfPurchase = moment(patient.Repurchase.EndOfPurchase);
+    //         console.log("Previous Date EOP:", lastEndOfPurchase.format());
+
+    //         // Add 30 seconds to lastEndOfPurchase
+    //         const updatedEndOfPurchase = moment(lastEndOfPurchase).add(30, 'seconds');
+    //         console.log("Updated Date EOP:", updatedEndOfPurchase.format()); // Format using moment()
+
+    //         // Set patient status to inactive if updatedEndOfPurchase is in the past
+    //         patient.PatientStatus = updatedEndOfPurchase <= new Date() ? true : false;
+    //         // patient.PatientStatus = updatedEndOfPurchase <= new Date() ? false : true;
+    //         await patient.save();
+
+    //         // Print or log patient information
+    //         console.log(`Patient ${patient.PatientName} status updated from ${previousStatus} to ${patient.PatientStatus}`);
+    //     }
+
+    //     console.log(`Updated status for all patients.`);
+    // } catch (err) {
+    //     console.error('Error updating patient status:', err);
+    // }
 };
-// Schedule the function to run once after a delay of 30 seconds
 setTimeout(mrUpdatePatientStatus, 30 * 1000);
-
-
-
-
 
 
 
