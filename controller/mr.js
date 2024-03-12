@@ -841,7 +841,7 @@ const mrGetDataBrandWise = async (req, res) => {
                         activePatientCount: brandData.activePatientCount,
                         inactivePatientCount: brandData.inactivePatientCount,
                         totalRepurchaseCount: brandData.totalRepurchaseCount,
-                        [`${brandName}TotolCartiridgesPurchase`]: brandTotolCartiridgesPurchase,
+                        TotolCartiridgesPurchase: brandTotolCartiridgesPurchase,
                     },
                 };
             }),
@@ -1100,7 +1100,6 @@ const mrGetScheduleData = async (req, res) => {
 // };
 // // Schedule the function to run once after a delay of 30 seconds
 // setTimeout(mrUpdatePatientStatus, 30 * 1000);
-
 
 const mrUpdatePatientStatus = async () => {
     // try {
