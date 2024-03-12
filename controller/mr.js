@@ -12,6 +12,7 @@ const csv = require('csv-parser');
 const xlsx = require('xlsx');
 const patient = require('../models/patient');
 const { format } = require('path');
+const moment = require('moment');
 
 const createMr = async (req, res) => {
     try {
@@ -520,6 +521,7 @@ const getMrBrandSummary = async (req, res) => {
 //     }
 // }
 
+
 const getMrPatients = async (req, res) => {
     try {
         const mrId = req.params.id;
@@ -569,54 +571,56 @@ const getMrPatients = async (req, res) => {
     }
 }
 
-const mrUpdatePatientStatus = async (req, res) => {
-    try {
+//Update the status automatically..
+// const mrUpdatePatientStatus = async (req, res) => {
+//     try {
 
-        //Format data...
-        const patientNewStatus = req.body.patientStatus;
+//         //Format data...
+//         const patientNewStatus = req.body.patientStatus;
 
-        // Map "Active" and "Inactive" to Boolean values
-        let patientStatus;
-        if (patientNewStatus === "DISCONTINUE") {
-            patientStatus = false;
-        } else if (patientNewStatus === "CONTINUING") {
-            patientStatus = true;
-        }
-
-
-        //Check MR exist or not....
-        const mrID = req.params.mrID;
-        const mrExist = await MrModel.findById(mrID);
-        if (!mrExist) {
-            res.status(404).send({ message: "MR not found...!!!", success: false });
-        }
-
-        //Check Patient exist or not....
-        const patientID = req.params.patientID;
-        const patientExist = await PatientModel.findById(patientID);
-        if (!patientExist) {
-            res.status(404).send({ message: "Patient not found...!!!", success: false });
-        }
+//         // Map "Active" and "Inactive" to Boolean values
+//         let patientStatus;
+//         if (patientNewStatus === "DISCONTINUE") {
+//             patientStatus = false;
+//         } else if (patientNewStatus === "CONTINUING") {
+//             patientStatus = true;
+//         }
 
 
-        //Update the patient Status..
-        const updatePatientStatus = await PatientModel.findByIdAndUpdate(
-            patientID,
-            { $set: { PatientStatus: patientStatus } },
-            { new: true }
-        );
+//         //Check MR exist or not....
+//         const mrID = req.params.mrID;
+//         const mrExist = await MrModel.findById(mrID);
+//         if (!mrExist) {
+//             res.status(404).send({ message: "MR not found...!!!", success: false });
+//         }
 
-        if (!updatePatientStatus) {
-            return res.status(500).send({ message: "Failed to Update the Patient Status..!!", success: false });
-        } else {
-            return res.status(201).send({ message: "MR Successfully changes the patient Status..", success: true });
-        }
+//         //Check Patient exist or not....
+//         const patientID = req.params.patientID;
+//         const patientExist = await PatientModel.findById(patientID);
+//         if (!patientExist) {
+//             res.status(404).send({ message: "Patient not found...!!!", success: false });
+//         }
 
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ message: "Failed to update the patient Status..!!!", success: false });
-    }
-}
+
+//         //Update the patient Status..
+//         const updatePatientStatus = await PatientModel.findByIdAndUpdate(
+//             patientID,
+//             { $set: { PatientStatus: patientStatus } },
+//             { new: true }
+//         );
+
+//         if (!updatePatientStatus) {
+//             return res.status(500).send({ message: "Failed to Update the Patient Status..!!", success: false });
+//         } else {
+//             return res.status(201).send({ message: "MR Successfully changes the patient Status..", success: true });
+//         }
+
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).send({ message: "Failed to update the patient Status..!!!", success: false });
+//     }
+// }
+
 
 const mrAddNewBrand = async (req, res) => {
     try {
@@ -870,6 +874,165 @@ const mrGetDoctorBrandWise = async (req, res) => {
     }
 }
 
+const mrGetScheduleData = async (req, res) => {
+
+
+
+    try {
+
+        const mrid = req.params.mrid;
+
+
+
+        // Assuming there's a field in the MR model that references the Patient model
+
+        const mr = await MrModel.findById(mrid).populate({
+
+            path: 'doctors',
+
+            populate: {
+
+                path: 'patients',
+
+                populate: {
+
+                    path: 'Repurchase.Brands', // Adjust the path based on your schema
+
+                    //   model: 'Brands',
+
+                },
+
+            },
+
+        });
+
+
+
+        if (!mr) {
+
+            return res.status(404).json({ message: 'MR not found' });
+
+        }
+
+
+
+        // Extract relevant information
+
+        // const repurchaseDetails = mr.doctors.flatMap((doctor) =>
+
+        //   doctor.patients
+
+        //     .filter((patient) => patient.Repurchase.length > 0)
+
+        //     .map((patient) => ({
+
+        //       DoctorName: doctor.DoctorName,
+
+        //       PatientName: patient.PatientName,
+
+        //       MobileNumber: patient.MobileNumber,
+
+        //       Location: patient.Location,
+
+        //       EndOfPurchase: patient.Repurchase[0].EndOfPurchase,
+
+        //     //   Brands: patient.Repurchase[0].Brands,
+
+        //     }))
+
+        // );
+
+
+
+        const repurchaseDetails = mr.doctors.flatMap((doctor) =>
+
+            doctor.patients
+
+                .filter((patient) => patient.Repurchase.length > 0)
+
+                .map((patient) => {
+
+                    const repurchaseInfo = patient.Repurchase[0]; // Assuming there's only one repurchase record
+
+                    const endOfPurchaseDate = new Date(repurchaseInfo.EndOfPurchase);
+
+                    const formattedEndOfPurchase = `${endOfPurchaseDate.getDate()}/${endOfPurchaseDate.getMonth() + 1}/${endOfPurchaseDate.getFullYear()}`;
+
+
+
+                    return {
+
+                        EndOfPurchase: formattedEndOfPurchase,
+
+                        DoctorName: doctor.DoctorName,
+
+                        PatientName: patient.PatientName,
+
+                        PatientMobileNumber: patient.MobileNumber,
+
+                        PatientLocation: patient.Location,
+
+                        PatientBrand: repurchaseInfo.Brands, // Join the brand names if it's an array
+
+                    };
+
+                })
+
+        );
+
+
+
+        res.json({ ScheduleData: repurchaseDetails });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({ message: 'Internal Server Error' });
+
+    }
+
+}
+
+
+//Final Automatic APIs.......Patient-Status-Update................
+
+const mrUpdatePatientStatus = async () => {
+    try {
+        // Define patientNewStatus directly within the function
+        const patientNewStatus = "DISCONTINUE"; // or "CONTINUING" depending on your requirement
+
+        // Find patients whose last repurchase was more than 30 seconds ago
+        const patientsToUpdate = await PatientModel.find({
+            "Repurchase.EndOfPurchase": {
+                $lte: moment().subtract(30, 'seconds').toISOString()
+            }
+        });
+
+        // Update the status of found patients
+        for (const patient of patientsToUpdate) {
+            const previousStatus = patient.PatientStatus;
+            // Set patient status to inactive if patientNewStatus is "DISCONTINUE"
+            patient.PatientStatus = patientNewStatus === "DISCONTINUE" ? false : true;
+            await patient.save();
+
+            // Print or log patient information
+            console.log(`Patient ${patient.PatientName} status updated from ${previousStatus} to ${patient.PatientStatus}`);
+        }
+
+        console.log(`Updated status for ${patientsToUpdate.length} patients.`);
+    } catch (err) {
+        console.error('Error updating patient status:', err);
+    }
+};
+// Schedule the function to run once after a delay of 30 seconds
+setTimeout(mrUpdatePatientStatus, 30 * 1000);
+
+
+
+
+
+
 
 
 
@@ -887,5 +1050,6 @@ module.exports = {
     mrUpdatePatientStatus,
     mrAddNewBrand,
     mrGetDoctorBrandWise,
-    mrGetDataBrandWise
+    mrGetDataBrandWise,
+    mrGetScheduleData
 }
