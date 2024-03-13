@@ -990,6 +990,35 @@ const getMrTodoList = async (req, res) => {
     }
 };
 
+const deleteMrTodo = async (req, res) => {
+    try {
+        const { id, taskId } = req.params;
+
+        // Check if MR exists
+        const mrInstance = await MrModel.findById(id);
+        if (!mrInstance) {
+            return res.status(404).json({ message: 'MR not found' });
+        }
+
+        // Find the todo task by ID
+        const todoToRemoveIndex = mrInstance.TodoData.findIndex(todo => todo._id == taskId);
+        if (todoToRemoveIndex === -1) {
+            return res.status(404).json({ message: 'Todo task not found in MR' });
+        }
+
+        // Remove the todo task from MR's TodoData
+        mrInstance.TodoData.splice(todoToRemoveIndex, 1);
+
+        // Save the updated MR instance
+        await mrInstance.save();
+
+        res.status(200).json({ message: 'Todo task deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: 'Failed to delete todo task' });
+    }
+};
+
 const mrGetScheduleData = async (req, res) => {
 
 
@@ -1002,7 +1031,7 @@ const mrGetScheduleData = async (req, res) => {
 
         // Assuming there's a field in the MR model that references the Patient model
 
-        const mr = await MrModel.mr.findById(mrid).populate({
+        const mr = await MrModel.findById(mrid).populate({
 
             path: 'doctors',
 
@@ -1208,5 +1237,6 @@ module.exports = {
     mrGetDataBrandWise,
     mrGetScheduleData,
     mrAddTodo,
-    getMrTodoList
+    getMrTodoList,
+    deleteMrTodo
 }
