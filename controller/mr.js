@@ -855,7 +855,6 @@ const mrGetDataBrandWise = async (req, res) => {
     }
 };
 
-
 const mrGetDoctorBrandWise = async (req, res) => {
     try {
         const mrId = req.params.mrId; // Assuming you get MR ID from request params
@@ -940,6 +939,57 @@ const mrGetDoctorBrandWise = async (req, res) => {
     }
 }
 
+const mrAddTodo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { task } = req.body;
+
+        // Check if MR exists
+        const mrInstance = await MrModel.findById(id);
+        if (!mrInstance) {
+            return res.status(404).json({ message: 'MR not found' });
+        }
+
+        // Create a new todo task
+        const newTodo = {
+            task: task,
+            // Date: new Date().toLocaleDateString(),
+            // Time: new Date().toLocaleTimeString()
+        };
+
+        // Add the new task to MR's TodoData
+        mrInstance.TodoData.push(newTodo);
+
+        // Save the updated MR instance
+        await mrInstance.save();
+
+        res.status(200).json({ message: 'New task added successfully', todo: newTodo });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: 'Failed to add new todo task' });
+    }
+};
+
+const getMrTodoList = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Check if MR exists
+        const mrInstance = await MrModel.findById(id).populate('TodoData');
+        if (!mrInstance) {
+            return res.status(404).json({ message: 'MR not found' });
+        }
+
+        // Extract todo list from MR instance
+        const todoList = mrInstance.TodoData;
+
+        res.status(200).json({ todoList });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: 'Failed to fetch todo list' });
+    }
+};
+
 const mrGetScheduleData = async (req, res) => {
 
 
@@ -952,7 +1002,7 @@ const mrGetScheduleData = async (req, res) => {
 
         // Assuming there's a field in the MR model that references the Patient model
 
-        const mr = await MrModel.findById(mrid).populate({
+        const mr = await MrModel.mr.findById(mrid).populate({
 
             path: 'doctors',
 
@@ -1101,6 +1151,7 @@ const mrGetScheduleData = async (req, res) => {
 // // Schedule the function to run once after a delay of 30 seconds
 // setTimeout(mrUpdatePatientStatus, 30 * 1000);
 
+
 const mrUpdatePatientStatus = async () => {
     // try {
     //     // Define patientNewStatus directly within the function
@@ -1155,5 +1206,7 @@ module.exports = {
     mrAddNewBrand,
     mrGetDoctorBrandWise,
     mrGetDataBrandWise,
-    mrGetScheduleData
+    mrGetScheduleData,
+    mrAddTodo,
+    getMrTodoList
 }

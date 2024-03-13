@@ -1,6 +1,36 @@
 const mongoose = require('mongoose');
 
+//TodoSchema of MR...
+const TodoSchema = new mongoose.Schema({
+    task: {
+        type: "String",
+        required: false
+    },
+    Date: {
+        type: String,
+        default: () => {
+            const currentDate = new Date();
+            const day = currentDate.getDate().toString().padStart(2, '0');
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const year = currentDate.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+    },
+    Time: {
+        type: String,
+        default: () => {
+            const currentTime = new Date();
+            const hours = currentTime.getHours().toString().padStart(2, '0');
+            const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+            const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+    }
+}, { timestamps: true });
 
+
+
+//MR Schema.....
 const mrSchema = new mongoose.Schema({
     EMPID: {
         type: String,
@@ -53,8 +83,38 @@ const mrSchema = new mongoose.Schema({
     repurchaseLogs: [],
     doctors: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' }
-    ]
+    ],
+    TodoData: {
+        type: [{
+            task: {
+                type: String,
+                required: false
+            },
+            Date: {
+                type: String,
+                default: () => {
+                    const currentDate = new Date();
+                    const day = currentDate.getDate().toString().padStart(2, '0');
+                    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                    const year = currentDate.getFullYear();
+                    return `${day}/${month}/${year}`;
+                }
+            },
+            Time: {
+                type: String,
+                default: () => {
+                    const currentTime = new Date();
+                    const hours = currentTime.getHours().toString().padStart(2, '0');
+                    const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+                    const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+                    return `${hours}:${minutes}:${seconds}`;
+                }
+            }
+        }],
+        default: []
+    }
 });
+
 
 
 module.exports = mongoose.model('MR', mrSchema);
