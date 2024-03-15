@@ -571,6 +571,86 @@ const getMrPatients = async (req, res) => {
     }
 }
 
+
+
+
+
+
+const getMrAllPatients = async (req, res) => {
+    try {
+        const mrId = req.params.mrId;
+
+        //Check MR present or not...
+        const mrExist = await MrModel.findById(mrId).populate({
+            path: 'doctors',
+            populate: {
+                path: 'patients',
+                model: 'Patient'
+            }
+        });
+
+        //Check MR exist or not...
+        if (!mrExist) {
+            return res.status(404).send({ message: "MR NOT FOUND...!!!", success: false });
+        }
+
+        //Loop data for processing...
+        const detailAllPatients = []
+
+        for (const doctors of mrExist.doctors) {
+            for (const patients of doctors.patients) {
+                for (const Prepurchase of patients.Repurchase) {
+                    const report = {
+                        PNAME: patients.PatientName || 'N/A',
+                        PNUMBER: patients.MobileNumber || 'N/A',
+                        PAGE: patients.Age || 'N/A',
+                        PGENDER: patients.Gender || 'N/A',
+                        PLOCATION: patients.Location || 'N/A',
+                        PSTATUS: patients.PatientStatus ? 'Active' : 'Inactive',
+                        PTYPE: patients.PatientType || 'N/A',
+                        PREASON: patients.Reason || 'N/A',
+                        PDOC: patients.doc || 'N/A',
+                        PDURATIONTHERAPY: Prepurchase.DurationOfTherapy || 'N/A',
+                        PUNITSOLD: Prepurchase.TotolCartiridgesPurchase || 'N/A',
+                        PDOP: Prepurchase.DateOfPurchase || 'N/A',
+                        PTSTATUS: Prepurchase.TherapyStatus || 'N/A',
+                        PDELIVARY: Prepurchase.Delivery || 'N/A',
+                        PTM: Prepurchase.TM || 'N/A',
+                        PCOMMENTS: Prepurchase.SubComments || 'N/A',
+                        PUNITPRESCRIBE: Prepurchase.UnitsPrescribe || 'N/A',
+                        PINDICATION: Prepurchase.Indication || 'N/A',
+                        PPRICE: Prepurchase.Price || 'N/A',
+                        PNODOSE: Prepurchase.NoDose || 'N/A',
+                        PTOTAL: Prepurchase.Total || 'N/A',
+                        PBRAND: Prepurchase.Brands.length ? Prepurchase.Brands.join(', ') : 'N/A',
+                    }
+                    detailAllPatients.push(report);
+                }
+            }
+        }
+
+        res.status(201).json(detailAllPatients);
+
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to load the data...!!!", success: false });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Update the status automatically..
 // const mrUpdatePatientStatus = async (req, res) => {
 //     try {
@@ -1238,5 +1318,6 @@ module.exports = {
     mrGetScheduleData,
     mrAddTodo,
     getMrTodoList,
-    deleteMrTodo
+    deleteMrTodo,
+    getMrAllPatients
 }
