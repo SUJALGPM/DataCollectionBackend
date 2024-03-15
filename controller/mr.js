@@ -601,7 +601,7 @@ const getMrAllPatients = async (req, res) => {
                         PAGE: patients.Age || 'N/A',
                         PGENDER: patients.Gender || 'N/A',
                         PLOCATION: patients.Location || 'N/A',
-                        PSTATUS: patients.PatientStatus || 'N/A',
+                        PSTATUS: patients.PatientStatus,
                         PTYPE: patients.PatientType || 'N/A',
                         PREASON: patients.Reason || 'N/A',
                         PDOC: patients.doc || 'N/A',
