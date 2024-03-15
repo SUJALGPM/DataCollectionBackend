@@ -594,7 +594,7 @@ const getMrAllPatients = async (req, res) => {
 
         for (const doctors of mrExist.doctors) {
             for (const patients of doctors.patients) {
-                for (const Prepurchase of patients.Repurchase) {
+                // for (const Prepurchase of patients.Repurchase) {
                     const report = {
                         PID: patients._id,
                         PNAME: patients.PatientName || 'N/A',
@@ -606,22 +606,22 @@ const getMrAllPatients = async (req, res) => {
                         PTYPE: patients.PatientType || 'N/A',
                         PREASON: patients.Reason || 'N/A',
                         PDOC: patients.doc || 'N/A',
-                        PDURATIONTHERAPY: Prepurchase.DurationOfTherapy || 'N/A',
-                        PUNITSOLD: Prepurchase.TotolCartiridgesPurchase || 'N/A',
-                        PDOP: Prepurchase.DateOfPurchase || 'N/A',
-                        PTSTATUS: Prepurchase.TherapyStatus || 'N/A',
-                        PDELIVARY: Prepurchase.Delivery || 'N/A',
-                        PTM: Prepurchase.TM || 'N/A',
-                        PCOMMENTS: Prepurchase.SubComments || 'N/A',
-                        PUNITPRESCRIBE: Prepurchase.UnitsPrescribe || 'N/A',
-                        PINDICATION: Prepurchase.Indication || 'N/A',
-                        PPRICE: Prepurchase.Price || 'N/A',
-                        PNODOSE: Prepurchase.NoDose || 'N/A',
-                        PTOTAL: Prepurchase.Total || 'N/A',
-                        PBRAND: Prepurchase.Brands.length ? Prepurchase.Brands.join(', ') : 'N/A',
+                        // PDURATIONTHERAPY: Prepurchase.DurationOfTherapy || 'N/A',
+                        // PUNITSOLD: Prepurchase.TotolCartiridgesPurchase || 'N/A',
+                        // PDOP: Prepurchase.DateOfPurchase || 'N/A',
+                        // PTSTATUS: Prepurchase.TherapyStatus || 'N/A',
+                        // PDELIVARY: Prepurchase.Delivery || 'N/A',
+                        // PTM: Prepurchase.TM || 'N/A',
+                        // PCOMMENTS: Prepurchase.SubComments || 'N/A',
+                        // PUNITPRESCRIBE: Prepurchase.UnitsPrescribe || 'N/A',
+                        // PINDICATION: Prepurchase.Indication || 'N/A',
+                        // PPRICE: Prepurchase.Price || 'N/A',
+                        // PNODOSE: Prepurchase.NoDose || 'N/A',
+                        // PTOTAL: Prepurchase.Total || 'N/A',
+                        // PBRAND: Prepurchase.Brands.length ? Prepurchase.Brands.join(', ') : 'N/A',
                     }
                     detailAllPatients.push(report);
-                }
+                // }
             }
         }
 
