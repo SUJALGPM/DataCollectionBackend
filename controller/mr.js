@@ -571,11 +571,6 @@ const getMrPatients = async (req, res) => {
     }
 }
 
-
-
-
-
-
 const getMrAllPatients = async (req, res) => {
     try {
         const mrId = req.params.mrId;
@@ -636,20 +631,6 @@ const getMrAllPatients = async (req, res) => {
         res.status(501).send({ message: "Failed to load the data...!!!", success: false });
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //Update the status automatically..
 // const mrUpdatePatientStatus = async (req, res) => {
