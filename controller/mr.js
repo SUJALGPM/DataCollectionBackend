@@ -596,6 +596,7 @@ const getMrAllPatients = async (req, res) => {
             for (const patients of doctors.patients) {
                 for (const Prepurchase of patients.Repurchase) {
                     const report = {
+                        PID: patients._id,
                         PNAME: patients.PatientName || 'N/A',
                         PNUMBER: patients.MobileNumber || 'N/A',
                         PAGE: patients.Age || 'N/A',
