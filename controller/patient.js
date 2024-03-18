@@ -214,22 +214,6 @@ const getPaitentById = async (req, res) => {
 }
 
 
-const handleCreateBrands = async (req, res) => {
-    try {
-
-        const { name } = req.body;
-        const brand = await BrandModel.findOne({ BrandName: name });
-        if (brand) return res.json({ msg: "Brand Name Already in DB" });
-        await new BrandModel({
-            BrandName: name
-        }).save();
-        return res.json({ msg: "Brand Added" });
-    } catch (error) {
-        console.log(error);
-        return res.json({ msg: "Internal Server Error", error })
-    }
-}
-
 
 const getAllBrands = async (req, res) => {
     try {
@@ -350,7 +334,6 @@ module.exports = {
     getAllPatient,
     dataPushToPatient,
     getPaitentById,
-    handleCreateBrands,
     getAllBrands,
     getPatinetBrands,
     singlePatientFullDetails

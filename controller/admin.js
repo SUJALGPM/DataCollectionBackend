@@ -1037,6 +1037,22 @@ const PrescriberReport = async (req, res) => {
     }
 };
 
+const handleCreateBrands = async (req, res) => {
+    try {
+
+        const { name } = req.body;
+        const brand = await BrandModel.findOne({ BrandName: name });
+        if (brand) return res.json({ msg: "Brand Name Already in DB" });
+        await new BrandModel({
+            BrandName: name
+        }).save();
+        return res.json({ msg: "Brand Added" });
+    } catch (error) {
+        console.log(error);
+        return res.json({ msg: "Internal Server Error", error })
+    }
+}
+
 const uplaodSheet = async (req, res) => {
     try {
         // Admin Exist or not checking......
@@ -1219,6 +1235,10 @@ const uplaodSheet = async (req, res) => {
 };
 
 
+
+
+
+
 module.exports = {
     handleAdminCreateAccounts,
     handleAdminLogin,
@@ -1234,5 +1254,6 @@ module.exports = {
     handleMrAndPatientReports,
     handleDetailedReport,
     PrescriberReport,
-    uplaodSheet
+    uplaodSheet,
+    handleCreateBrands
 }

@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
 
-const { handleAdminCreateAccounts, handleAdminLogin, handleAdminReports, handleAdminSideDetailReports, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, verifyJwtForClient, handleReportAdminCreate, handleAdminPatientWiseReports, handleDoctorWisePatientCount, handleMrAndPatientReports, handleDetailedReport, PrescriberReport, uplaodSheet, deleteCollection } = require('../controller/admin');
+const { handleAdminCreateAccounts, handleAdminLogin, handleAdminReports, handleAdminSideDetailReports, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, verifyJwtForClient, handleReportAdminCreate, handleAdminPatientWiseReports, handleDoctorWisePatientCount, handleMrAndPatientReports, handleDetailedReport, PrescriberReport, uplaodSheet, deleteCollection, handleCreateBrands } = require('../controller/admin');
 const { isAuthenticated } = require("../middleware/auth");
 
 
@@ -39,6 +39,7 @@ router.get("/Doctor-Wise-Patient-Recruited-Count", handleDoctorWisePatientCount)
 router.get("/Mr-And-Patient-Reports", handleMrAndPatientReports);
 router.get("/Admin-Detailed-Reports", handleDetailedReport);
 router.get("/Admin-Prescriber-Report", PrescriberReport);
+router.post("/create-brands", handleCreateBrands);
 router.post("/admin-upload/:id", upload, uplaodSheet);
 
 
