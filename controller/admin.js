@@ -1412,6 +1412,137 @@ const adminDoctorList = async (req, res) => {
     }
 }
 
+const admingetDoctorId = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        //Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        //check admin exist or not..
+        const adminExist = await adminModels.findById(adminId).populate({
+            path: 'Slm',
+            model: 'Slm',
+            populate: {
+                path: 'Flm',
+                model: 'Flm',
+                populate: {
+                    path: 'Mrs',
+                    model: 'MR',
+                    populate: {
+                        path: 'doctors',
+                        model: 'Doctor'
+                    }
+                }
+            }
+        });
+
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        //Store in empty conatiner...
+        const detailDoctorData = [];
+
+        //Loop Data of mr...
+        for (const slm of adminExist.Slm) {
+            for (const flm of slm.Flm) {
+                for (const mrs of flm.Mrs) {
+                    for (const doctors of mrs.doctors) {
+                        const report = {
+                            DROBJID: doctors._id,
+                            DRSCCODE: doctors.SCCode,
+                            DRNAME: doctors.DoctorName,
+                        }
+                        detailDoctorData.push(report);
+                    }
+                }
+            }
+        }
+
+        //Send the response of loop data...
+        res.status(201).json(detailDoctorData);
+
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to mr list..!!!", success: false });
+    }
+}
+
+const adminPatientList = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        //Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        //check admin exist or not..
+        const adminExist = await adminModels.findById(adminId).populate({
+            path: 'Slm',
+            model: 'Slm',
+            populate: {
+                path: 'Flm',
+                model: 'Flm',
+                populate: {
+                    path: 'Mrs',
+                    model: 'MR',
+                    populate: {
+                        path: 'doctors',
+                        model: 'Doctor',
+                        populate: {
+                            path: 'patients',
+                            model: 'Patient'
+                        }
+                    }
+                }
+            }
+        });
+
+
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        //Store in empty conatiner...
+        const detailPatientlist = [];
+
+        //Loop Data of mr...
+        for (const slm of adminExist.Slm) {
+            for (const flm of slm.Flm) {
+                for (const mrs of flm.Mrs) {
+                    for (const doctors of mrs.doctors) {
+                        for (const patients of doctors.patients) {
+                            const report = {
+                                PNAME: patients.PatientName,
+                                PNUMBER: patients.MobileNumber,
+                                PAGE: patients.Age,
+                                PGENDER: patients.Gender,
+                                PLOCATION: patients.Location,
+                                PSTATUS: patients.PatientStatus,
+                                PREASON: patients.Reason,
+                                PTYPE: patients.PatientType,
+                                PDOC: patients.doc,
+                            }
+                            detailPatientlist.push(report);
+                        }
+                    }
+                }
+            }
+        }
+
+        //Send the response of loop data...
+        res.status(201).json(detailPatientlist);
+
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to patient list..!!!", success: false });
+    }
+}
+
 
 
 
@@ -1434,5 +1565,7 @@ module.exports = {
     handleCreateBrands,
     adminMrList,
     admingetMrId,
-    adminDoctorList
+    adminDoctorList,
+    admingetDoctorId,
+    adminPatientList
 }

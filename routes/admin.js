@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
 
-const { handleAdminCreateAccounts, handleAdminLogin, handleAdminReports, handleAdminSideDetailReports, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, verifyJwtForClient, handleReportAdminCreate, handleAdminPatientWiseReports, handleDoctorWisePatientCount, handleMrAndPatientReports, handleDetailedReport, PrescriberReport, uplaodSheet, deleteCollection, handleCreateBrands, adminMrList, adminDoctorList, admingetMrId } = require('../controller/admin');
+const { handleAdminCreateAccounts, handleAdminLogin, handleAdminReports, handleAdminSideDetailReports, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, verifyJwtForClient, handleReportAdminCreate, handleAdminPatientWiseReports, handleDoctorWisePatientCount, handleMrAndPatientReports, handleDetailedReport, PrescriberReport, uplaodSheet, deleteCollection, handleCreateBrands, adminMrList, adminDoctorList, admingetMrId, adminPatientList, admingetDoctorId } = require('../controller/admin');
 const { isAuthenticated } = require("../middleware/auth");
 
 
@@ -48,6 +48,14 @@ router.get("/Admin-Prescriber-Report", PrescriberReport);
 router.get("/admin-mr-list/:id", adminMrList);
 router.get("/admin-mr-Data/:id", admingetMrId);
 router.get("/admin-doctor-list/:id", adminDoctorList);
+router.get("/admin-doctor-Data/:id", admingetDoctorId);
+router.get("/admin-patient-list/:id", adminPatientList);
+
+
+
+
+
+
 
 module.exports = router
 
