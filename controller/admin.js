@@ -1234,7 +1234,183 @@ const uplaodSheet = async (req, res) => {
     }
 };
 
+const adminMrList = async (req, res) => {
+    try {
+        const adminId = req.params.id;
 
+        //Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        //check admin exist or not..
+        const adminExist = await adminModels.findById(adminId).populate({
+            path: 'Slm',
+            model: 'Slm',
+            populate: {
+                path: 'Flm',
+                model: 'Flm',
+                populate: {
+                    path: 'Mrs',
+                    model: 'MR',
+                }
+            }
+        });
+
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        //Store in empty conatiner...
+        const detailMRlist = [];
+
+        //Loop Data of mr...
+        for (const slm of adminExist.Slm) {
+            for (const flm of slm.Flm) {
+                for (const mrs of flm.Mrs) {
+                    const report = {
+                        MRID: mrs.EMPID,
+                        MRNAME: mrs.PSNAME,
+                        MRPASS: mrs.Password,
+                        MRNUMBER: mrs.Number,
+                        MRREGION: mrs.Region,
+                        MRHQ: mrs.HQ,
+                        MRDOJ: mrs.DOJ,
+                        MRDESG: mrs.DESIGNATION,
+                        MRDOC: mrs.doc,
+                    }
+                    detailMRlist.push(report);
+                }
+            }
+        }
+
+        //Send the response of loop data...
+        res.status(201).json(detailMRlist);
+
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to mr list..!!!", success: false });
+    }
+}
+
+const admingetMrId = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        //Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        //check admin exist or not..
+        const adminExist = await adminModels.findById(adminId).populate({
+            path: 'Slm',
+            model: 'Slm',
+            populate: {
+                path: 'Flm',
+                model: 'Flm',
+                populate: {
+                    path: 'Mrs',
+                    model: 'MR',
+                }
+            }
+        });
+
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        //Store in empty conatiner...
+        const detailMRlist = [];
+
+        //Loop Data of mr...
+        for (const slm of adminExist.Slm) {
+            for (const flm of slm.Flm) {
+                for (const mrs of flm.Mrs) {
+                    const report = {
+                        MROBJID: mrs._id,
+                        MRID: mrs.EMPID,
+                        MRNAME: mrs.PSNAME,
+                    }
+                    detailMRlist.push(report);
+                }
+            }
+        }
+
+        //Send the response of loop data...
+        res.status(201).json(detailMRlist);
+
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to mr list..!!!", success: false });
+    }
+}
+
+const adminDoctorList = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        //Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        //check admin exist or not..
+        const adminExist = await adminModels.findById(adminId).populate({
+            path: 'Slm',
+            model: 'Slm',
+            populate: {
+                path: 'Flm',
+                model: 'Flm',
+                populate: {
+                    path: 'Mrs',
+                    model: 'MR',
+                    populate: {
+                        path: 'doctors',
+                        model: 'Doctor'
+                    }
+                }
+            }
+        });
+
+
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        //Store in empty conatiner...
+        const detailDoctorlist = [];
+
+        //Loop Data of mr...
+        for (const slm of adminExist.Slm) {
+            for (const flm of slm.Flm) {
+                for (const mrs of flm.Mrs) {
+                    for (const doctors of mrs.doctors) {
+                        const report = {
+                            DRNAME: doctors.DoctorName,
+                            DRSCCODE: doctors.SCCode,
+                            DRSPEC: doctors.Specialty,
+                            DRPLACE: doctors.Place,
+                            DRCLASS: doctors.CLASS,
+                            DRVF: doctors.VF,
+                            DRPOTENTIAL: doctors.DoctorPotential,
+                            DRSTATUS: doctors.DoctorStatus,
+                            DRDOC: doctors.doc,
+                        }
+                        detailDoctorlist.push(report);
+                    }
+                }
+            }
+        }
+
+        //Send the response of loop data...
+        res.status(201).json(detailDoctorlist);
+
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to doctor list..!!!", success: false });
+    }
+}
 
 
 
@@ -1255,5 +1431,8 @@ module.exports = {
     handleDetailedReport,
     PrescriberReport,
     uplaodSheet,
-    handleCreateBrands
+    handleCreateBrands,
+    adminMrList,
+    admingetMrId,
+    adminDoctorList
 }
