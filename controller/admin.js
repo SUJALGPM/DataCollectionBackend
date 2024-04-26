@@ -1633,68 +1633,6 @@ const adminDetailDurationWise = async (req, res) => {
 
 }
 
-/************************************************************************************************************************************/
-
-
-function formatDate(dateString) {
-    let date;
-
-    // Check if dateString is in the format "dd-mm-yyyy"
-    if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
-        const [day, month, year] = dateString.split('-');
-        date = new Date(`${year}-${month}-${day}`);
-    }
-    // Check if dateString is in the format "Wed Mar 20 2024 00:00:00 GMT+0000 (Coordinated Universal Time)"
-    else if (/\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2}/.test(dateString)) {
-        date = new Date(dateString);
-    }
-    // Check if dateString is already in the format "yyyy-mm-dd"
-    else if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-        date = new Date(dateString);
-    }
-    else {
-        throw new Error('Invalid date format');
-    }
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-}
-
-// async function addRepurchaseToBrand(brandWiseMRRepurchase, mrId, mrName, brands, label) {
-//     for (const brand of brands) {
-//         if (!brandWiseMRRepurchase[brand]) {
-//             brandWiseMRRepurchase[brand] = {};
-//         }
-
-//         if (!brandWiseMRRepurchase[brand][label]) {
-//             brandWiseMRRepurchase[brand][label] = { MRName: mrName, Count: 1 };
-//         } else {
-//             brandWiseMRRepurchase[brand][label].Count++;
-//         }
-//     }
-// }
-
-async function addRepurchaseToBrand(brandWiseMRRepurchase, mrId, mrName, brands, label) {
-    for (const brand of brands) {
-        if (!brandWiseMRRepurchase[brand]) {
-            brandWiseMRRepurchase[brand] = {};
-        }
-
-        if (!brandWiseMRRepurchase[brand][label]) {
-            brandWiseMRRepurchase[brand][label] = { MRName: mrName, Count: 1 };
-        } else {
-            // Check if the current MR's repurchase count is higher than the existing count
-            if (brandWiseMRRepurchase[brand][label].Count < 1 || brandWiseMRRepurchase[brand][label].Count < 1) {
-                brandWiseMRRepurchase[brand][label].MRName = mrName;
-                brandWiseMRRepurchase[brand][label].Count = 1;
-            }
-        }
-    }
-}
-
 
 const adminMRdurationReport = async (req, res) => {
     try {
@@ -1711,7 +1649,26 @@ const adminMRdurationReport = async (req, res) => {
             return res.status(401).send({ message: "Admin not found..!!!", success: false });
         }
 
-        // Store brand-wise MR repurchase totals for yesterday, last 7 days, and last 30 days
+        // Define function to get yesterday's date, last week's date, and last month's date
+        const getYesterdayDate = () => {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            return yesterday;
+        };
+
+        const getLastWeekDate = () => {
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            return lastWeek;
+        };
+
+        const getLastMonthDate = () => {
+            const lastMonth = new Date();
+            lastMonth.setDate(lastMonth.getDate() - 31);
+            return lastMonth;
+        };
+
+        // Initialize brand-wise totals object
         const brandWiseMRRepurchase = {};
 
         // Loop through MRs under the admin
@@ -1724,58 +1681,80 @@ const adminMRdurationReport = async (req, res) => {
                 for (const Flms of flmExist) {
                     const mrExist = await MrModel.find({ _id: { $in: Flms.Mrs } });
 
-                    for (const Mrs of mrExist) {
-                        const doctorExist = await DoctorModel.find({ _id: { $in: Mrs.doctors } });
+                    for (const mr of mrExist) {
+                        if (!mr.durationWise || mr.durationWise.length === 0) {
+                            continue;
+                        }
 
-                        for (const Doctors of doctorExist) {
-                            const patientExist = await PatientModel.find({ _id: { $in: Doctors.patients } });
+                        const brandName = mr.durationWise[0].brandName;
 
-                            // Calculate MR-wise repurchase totals for yesterday, last 7 days, and last 30 days
-                            const yesterday = new Date();
-                            yesterday.setDate(yesterday.getDate() - 0);
+                        // Check if brandName already exists in totals object, if not, initialize it
+                        if (!brandWiseMRRepurchase[brandName]) {
+                            brandWiseMRRepurchase[brandName] = {
+                                highestRepurchase: { repurchaseTotal: 0, MRName: '' },
+                                previousDay: { repurchaseTotal: 0, MRName: '' },
+                                lastSevenDays: { repurchaseTotal: 0, MRName: '' },
+                                lastMonth: { repurchaseTotal: 0, MRName: '' }
+                            };
+                        }
 
-                            const lastWeek = new Date();
-                            lastWeek.setDate(lastWeek.getDate() - 7);
+                        // Calculate repurchase totals for yesterday, last 7 days, and last 31 days
+                        const yesterday = getYesterdayDate();
+                        const lastWeek = getLastWeekDate();
+                        const lastMonth = getLastMonthDate();
 
-                            const lastMonth = new Date();
-                            lastMonth.setDate(lastMonth.getDate() - 30);
+                        const repurchaseYesterday = mr.durationWise.filter(
+                            (item) => new Date(item.repurchaseDate) >= yesterday
+                        );
+                        const repurchaseLastWeek = mr.durationWise.filter(
+                            (item) => new Date(item.repurchaseDate) >= lastWeek
+                        );
+                        const repurchaseLastMonth = mr.durationWise.filter(
+                            (item) => new Date(item.repurchaseDate) >= lastMonth
+                        );
 
+                        // Update brand-wise totals object with repurchase totals and MR names
+                        brandWiseMRRepurchase[brandName].previousDay.repurchaseTotal += repurchaseYesterday.length;
+                        brandWiseMRRepurchase[brandName].lastSevenDays.repurchaseTotal += repurchaseLastWeek.length;
+                        brandWiseMRRepurchase[brandName].lastMonth.repurchaseTotal += repurchaseLastMonth.length;
 
-                            for (const patient of patientExist) {
-                                for (const repurchase of patient.Repurchase) {
-                                    console.log("Previous Date :", repurchase.DateOfPurchase);
-                                    const repurchaseDate = formatDate(repurchase.DateOfPurchase);
-                                    console.log("After Date :", repurchaseDate);
-
-                                    if (repurchaseDate >= yesterday.toISOString().slice(0, 10)) {
-                                        // For yesterday....
-                                        addRepurchaseToBrand(brandWiseMRRepurchase, Mrs.EMPID, Mrs.PSNAME, repurchase.Brands, 'Yesterday');
-                                    }
-
-                                    if (repurchaseDate >= lastWeek.toISOString().slice(0, 10)) {
-                                        // For last 7 days....
-                                        addRepurchaseToBrand(brandWiseMRRepurchase, Mrs.EMPID, Mrs.PSNAME, repurchase.Brands, 'Last 7 Days');
-                                    }
-
-                                    if (repurchaseDate >= lastMonth.toISOString().slice(0, 10)) {
-                                        // For last 30 days....
-                                        addRepurchaseToBrand(brandWiseMRRepurchase, Mrs.EMPID, Mrs.PSNAME, repurchase.Brands, 'Last 30 Days');
-                                    }
-                                }
-                            }
+                        // Update highest repurchase MR name if applicable
+                        if (repurchaseYesterday.length > brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal) {
+                            brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal = repurchaseYesterday.length;
+                            brandWiseMRRepurchase[brandName].highestRepurchase.MRName = mr.PSNAME;
+                        }
+                        if (repurchaseLastWeek.length > brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal) {
+                            brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal = repurchaseLastWeek.length;
+                            brandWiseMRRepurchase[brandName].highestRepurchase.MRName = mr.PSNAME;
+                        }
+                        if (repurchaseLastMonth.length > brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal) {
+                            brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal = repurchaseLastMonth.length;
+                            brandWiseMRRepurchase[brandName].highestRepurchase.MRName = mr.PSNAME;
                         }
                     }
                 }
             }
         }
 
-        // Now brandWiseMRRepurchase object contains brand-wise MR repurchase totals with labels
+        // Now update the MRName for each period based on highest repurchase
+        Object.keys(brandWiseMRRepurchase).forEach((brand) => {
+            const highestRepurchase = brandWiseMRRepurchase[brand].highestRepurchase;
+
+            brandWiseMRRepurchase[brand].previousDay.MRName = highestRepurchase.MRName;
+            brandWiseMRRepurchase[brand].lastSevenDays.MRName = highestRepurchase.MRName;
+            brandWiseMRRepurchase[brand].lastMonth.MRName = highestRepurchase.MRName;
+        });
+
+        // Now brandWiseMRRepurchase object contains brand-wise MR repurchase totals with highest repurchase MR names for each period
         res.status(200).json({ brandWiseMRRepurchase, success: true });
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: "Internal Server Error", success: false });
     }
-}
+};
+
+
+
 
 
 
