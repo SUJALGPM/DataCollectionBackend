@@ -1,13 +1,13 @@
-const PatientModel = require("../models/patient");
 const adminModels = require("../models/admin");
-const MrModel = require("../models/mr");
-const BrandModel = require("../models/Brands")
-const DoctorModel = require('../models/doctor');
-const mongoose = require('mongoose');
-const jwt = require("jsonwebtoken");
 const tlmModel = require("../models/Tlm");
 const slmModel = require("../models/Slm");
 const flmModel = require('../models/Flm');
+const MrModel = require("../models/mr");
+const DoctorModel = require('../models/doctor');
+const PatientModel = require("../models/patient");
+const BrandModel = require("../models/Brands")
+const jwt = require("jsonwebtoken");
+const mongoose = require('mongoose');
 const xlsx = require("xlsx");
 const patient = require("../models/patient");
 const SECRET = process.env.SECRET;
@@ -617,7 +617,6 @@ const handleReportAdminCreate = async (req, res) => {
         });
     }
 }
-
 
 const handleCreateContentAdmin = async (req, res) => {
     try {
@@ -1543,6 +1542,276 @@ const adminPatientList = async (req, res) => {
     }
 }
 
+// MRNAME COMING BUT SOMETHING WRONG...
+const adminDetailDurationWise = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        // Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        // Check admin exist or not..
+        const adminExist = await adminModels.findById(adminId);
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        // Store mining data...
+        const brandData = {};
+
+        // Loop data....
+        for (const Admins of adminExist.Slm) {
+            const slmExist = await slmModel.find({ _id: { $in: Admins } });
+
+            for (const Slms of slmExist) {
+                const flmExist = await flmModel.find({ _id: { $in: Slms.Flm } });
+
+                for (const Flms of flmExist) {
+                    const mrExist = await MrModel.find({ _id: { $in: Flms.Mrs } });
+
+                    for (const Mrs of mrExist) {
+                        const doctorExist = await DoctorModel.find({ _id: { $in: Mrs.doctors } });
+
+                        for (const Doctors of doctorExist) {
+                            const patientExist = await PatientModel.find({ _id: { $in: Doctors.patients } });
+
+                            patientExist.forEach(patient => {
+                                patient.Repurchase.forEach(repurchase => {
+                                    repurchase.Brands.forEach(brandName => {
+                                        const repurchaseDate = new Date(repurchase.DateOfPurchase);
+
+                                        // Calculate days difference
+                                        const currentDate = new Date();
+                                        const daysDifference = Math.ceil((currentDate - repurchaseDate) / (1000 * 60 * 60 * 24));
+
+                                        // Update brandData object
+                                        if (!brandData[brandName]) {
+                                            brandData[brandName] = {
+                                                previousDay: { repurchaseTotal: 0, MRName: '' },
+                                                lastSevenDays: { repurchaseTotal: 0, MRName: '' },
+                                                lastMonth: { repurchaseTotal: 0, MRName: '' },
+                                            };
+                                        }
+
+                                        if (daysDifference === 1) {
+                                            brandData[brandName].previousDay.repurchaseTotal++;
+                                            if (brandData[brandName].previousDay.MRName === '' || brandData[brandName].previousDay.repurchaseTotal > brandData[brandName].previousDay.repurchaseTotal) {
+                                                console.log("PreviousDayWinner :", Mrs.PSNAME);
+                                                brandData[brandName].previousDay.MRName = Mrs.PSNAME;
+                                            }
+                                        }
+
+                                        if (daysDifference <= 7) {
+                                            brandData[brandName].lastSevenDays.repurchaseTotal++;
+                                            if (brandData[brandName].lastSevenDays.MRName === '' || brandData[brandName].lastSevenDays.repurchaseTotal > brandData[brandName].lastSevenDays.repurchaseTotal) {
+                                                brandData[brandName].lastSevenDays.MRName = Mrs.PSNAME;
+                                            }
+                                        }
+
+                                        if (daysDifference <= 30) {
+                                            brandData[brandName].lastMonth.repurchaseTotal++;
+                                            if (brandData[brandName].lastMonth.MRName === '' || brandData[brandName].lastMonth.repurchaseTotal > brandData[brandName].lastMonth.repurchaseTotal) {
+                                                brandData[brandName].lastMonth.MRName = Mrs.PSNAME;
+                                            }
+                                        }
+                                    });
+                                });
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        res.status(201).json(brandData);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        res.status(500).send({ message: "Internal Server Error", success: false });
+    }
+
+}
+
+/************************************************************************************************************************************/
+
+
+function formatDate(dateString) {
+    let date;
+
+    // Check if dateString is in the format "dd-mm-yyyy"
+    if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
+        const [day, month, year] = dateString.split('-');
+        date = new Date(`${year}-${month}-${day}`);
+    }
+    // Check if dateString is in the format "Wed Mar 20 2024 00:00:00 GMT+0000 (Coordinated Universal Time)"
+    else if (/\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2}/.test(dateString)) {
+        date = new Date(dateString);
+    }
+    // Check if dateString is already in the format "yyyy-mm-dd"
+    else if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        date = new Date(dateString);
+    }
+    else {
+        throw new Error('Invalid date format');
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+// async function addRepurchaseToBrand(brandWiseMRRepurchase, mrId, mrName, brands, label) {
+//     for (const brand of brands) {
+//         if (!brandWiseMRRepurchase[brand]) {
+//             brandWiseMRRepurchase[brand] = {};
+//         }
+
+//         if (!brandWiseMRRepurchase[brand][label]) {
+//             brandWiseMRRepurchase[brand][label] = { MRName: mrName, Count: 1 };
+//         } else {
+//             brandWiseMRRepurchase[brand][label].Count++;
+//         }
+//     }
+// }
+
+async function addRepurchaseToBrand(brandWiseMRRepurchase, mrId, mrName, brands, label) {
+    for (const brand of brands) {
+        if (!brandWiseMRRepurchase[brand]) {
+            brandWiseMRRepurchase[brand] = {};
+        }
+
+        if (!brandWiseMRRepurchase[brand][label]) {
+            brandWiseMRRepurchase[brand][label] = { MRName: mrName, Count: 1 };
+        } else {
+            // Check if the current MR's repurchase count is higher than the existing count
+            if (brandWiseMRRepurchase[brand][label].Count < 1 || brandWiseMRRepurchase[brand][label].Count < 1) {
+                brandWiseMRRepurchase[brand][label].MRName = mrName;
+                brandWiseMRRepurchase[brand][label].Count = 1;
+            }
+        }
+    }
+}
+
+
+const adminMRdurationReport = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        // Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        // Check admin exist or not..
+        const adminExist = await adminModels.findById(adminId);
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        // Store brand-wise MR repurchase totals for yesterday, last 7 days, and last 30 days
+        const brandWiseMRRepurchase = {};
+
+        // Loop through MRs under the admin
+        for (const Admins of adminExist.Slm) {
+            const slmExist = await slmModel.find({ _id: { $in: Admins } });
+
+            for (const Slms of slmExist) {
+                const flmExist = await flmModel.find({ _id: { $in: Slms.Flm } });
+
+                for (const Flms of flmExist) {
+                    const mrExist = await MrModel.find({ _id: { $in: Flms.Mrs } });
+
+                    for (const Mrs of mrExist) {
+                        const doctorExist = await DoctorModel.find({ _id: { $in: Mrs.doctors } });
+
+                        for (const Doctors of doctorExist) {
+                            const patientExist = await PatientModel.find({ _id: { $in: Doctors.patients } });
+
+                            // Calculate MR-wise repurchase totals for yesterday, last 7 days, and last 30 days
+                            const yesterday = new Date();
+                            yesterday.setDate(yesterday.getDate() - 0);
+
+                            const lastWeek = new Date();
+                            lastWeek.setDate(lastWeek.getDate() - 7);
+
+                            const lastMonth = new Date();
+                            lastMonth.setDate(lastMonth.getDate() - 30);
+
+
+                            for (const patient of patientExist) {
+                                for (const repurchase of patient.Repurchase) {
+                                    console.log("Previous Date :", repurchase.DateOfPurchase);
+                                    const repurchaseDate = formatDate(repurchase.DateOfPurchase);
+                                    console.log("After Date :", repurchaseDate);
+
+                                    if (repurchaseDate >= yesterday.toISOString().slice(0, 10)) {
+                                        // For yesterday....
+                                        addRepurchaseToBrand(brandWiseMRRepurchase, Mrs.EMPID, Mrs.PSNAME, repurchase.Brands, 'Yesterday');
+                                    }
+
+                                    if (repurchaseDate >= lastWeek.toISOString().slice(0, 10)) {
+                                        // For last 7 days....
+                                        addRepurchaseToBrand(brandWiseMRRepurchase, Mrs.EMPID, Mrs.PSNAME, repurchase.Brands, 'Last 7 Days');
+                                    }
+
+                                    if (repurchaseDate >= lastMonth.toISOString().slice(0, 10)) {
+                                        // For last 30 days....
+                                        addRepurchaseToBrand(brandWiseMRRepurchase, Mrs.EMPID, Mrs.PSNAME, repurchase.Brands, 'Last 30 Days');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Now brandWiseMRRepurchase object contains brand-wise MR repurchase totals with labels
+        res.status(200).json({ brandWiseMRRepurchase, success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Internal Server Error", success: false });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1567,5 +1836,7 @@ module.exports = {
     admingetMrId,
     adminDoctorList,
     admingetDoctorId,
-    adminPatientList
+    adminPatientList,
+    adminDetailDurationWise,
+    adminMRdurationReport
 }

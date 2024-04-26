@@ -166,7 +166,15 @@ const dataPushToPatient = async (req, res) => {
                     Total: data.Price * data.NoDose
                 }
             }
+
+            const durationRepurchaseEntry = {
+                brandName: data.selectedBrand ? data.selectedBrand.value : null,
+                repurchaseDate: new Date(data.dop),
+                doctorName: doctorExist.DoctorName,
+                patientName: patient.PatientName
+            };
             mrExist.repurchaseLogs.push(NewRepurchaseEntry);
+            mrExist.durationWise.push(durationRepurchaseEntry);
         });
         await mrExist.save();
 
@@ -212,7 +220,6 @@ const getPaitentById = async (req, res) => {
         })
     }
 }
-
 
 
 const getAllBrands = async (req, res) => {
