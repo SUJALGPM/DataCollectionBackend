@@ -170,6 +170,7 @@ const dataPushToPatient = async (req, res) => {
             const repurchaseDate = new Date(data.dop);
             const formattedDate = repurchaseDate.toISOString().split('T')[0];
 
+            //Popular mr as per repurchase...
             const durationRepurchaseEntry = {
                 brandName: data.selectedBrand ? data.selectedBrand.value : null,
                 repurchaseDate: formattedDate,

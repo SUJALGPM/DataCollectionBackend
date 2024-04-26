@@ -595,32 +595,32 @@ const getMrAllPatients = async (req, res) => {
         for (const doctors of mrExist.doctors) {
             for (const patients of doctors.patients) {
                 // for (const Prepurchase of patients.Repurchase) {
-                    const report = {
-                        PID: patients._id,
-                        PNAME: patients.PatientName || 'N/A',
-                        PNUMBER: patients.MobileNumber || 'N/A',
-                        PAGE: patients.Age || 'N/A',
-                        PGENDER: patients.Gender || 'N/A',
-                        PLOCATION: patients.Location || 'N/A',
-                        PSTATUS: patients.PatientStatus,
-                        PTYPE: patients.PatientType || 'N/A',
-                        PREASON: patients.Reason || 'N/A',
-                        PDOC: patients.doc || 'N/A',
-                        // PDURATIONTHERAPY: Prepurchase.DurationOfTherapy || 'N/A',
-                        // PUNITSOLD: Prepurchase.TotolCartiridgesPurchase || 'N/A',
-                        // PDOP: Prepurchase.DateOfPurchase || 'N/A',
-                        // PTSTATUS: Prepurchase.TherapyStatus || 'N/A',
-                        // PDELIVARY: Prepurchase.Delivery || 'N/A',
-                        // PTM: Prepurchase.TM || 'N/A',
-                        // PCOMMENTS: Prepurchase.SubComments || 'N/A',
-                        // PUNITPRESCRIBE: Prepurchase.UnitsPrescribe || 'N/A',
-                        // PINDICATION: Prepurchase.Indication || 'N/A',
-                        // PPRICE: Prepurchase.Price || 'N/A',
-                        // PNODOSE: Prepurchase.NoDose || 'N/A',
-                        // PTOTAL: Prepurchase.Total || 'N/A',
-                        // PBRAND: Prepurchase.Brands.length ? Prepurchase.Brands.join(', ') : 'N/A',
-                    }
-                    detailAllPatients.push(report);
+                const report = {
+                    PID: patients._id,
+                    PNAME: patients.PatientName || 'N/A',
+                    PNUMBER: patients.MobileNumber || 'N/A',
+                    PAGE: patients.Age || 'N/A',
+                    PGENDER: patients.Gender || 'N/A',
+                    PLOCATION: patients.Location || 'N/A',
+                    PSTATUS: patients.PatientStatus,
+                    PTYPE: patients.PatientType || 'N/A',
+                    PREASON: patients.Reason || 'N/A',
+                    PDOC: patients.doc || 'N/A',
+                    // PDURATIONTHERAPY: Prepurchase.DurationOfTherapy || 'N/A',
+                    // PUNITSOLD: Prepurchase.TotolCartiridgesPurchase || 'N/A',
+                    // PDOP: Prepurchase.DateOfPurchase || 'N/A',
+                    // PTSTATUS: Prepurchase.TherapyStatus || 'N/A',
+                    // PDELIVARY: Prepurchase.Delivery || 'N/A',
+                    // PTM: Prepurchase.TM || 'N/A',
+                    // PCOMMENTS: Prepurchase.SubComments || 'N/A',
+                    // PUNITPRESCRIBE: Prepurchase.UnitsPrescribe || 'N/A',
+                    // PINDICATION: Prepurchase.Indication || 'N/A',
+                    // PPRICE: Prepurchase.Price || 'N/A',
+                    // PNODOSE: Prepurchase.NoDose || 'N/A',
+                    // PTOTAL: Prepurchase.Total || 'N/A',
+                    // PBRAND: Prepurchase.Brands.length ? Prepurchase.Brands.join(', ') : 'N/A',
+                }
+                detailAllPatients.push(report);
                 // }
             }
         }
@@ -739,8 +739,19 @@ const mrAddNewBrand = async (req, res) => {
             repurchaseData: formData
         }
 
+        //Popular mr as per repurchase...
+        const repurchaseDate = new Date(DateOfPurchase);
+        const formattedDate = repurchaseDate.toISOString().split('T')[0];
+        const durationRepurchaseEntry = {
+            brandName: Brands,
+            repurchaseDate: formattedDate,
+            doctorName: doctorExist.DoctorName,
+            patientName: patient.PatientName
+        };
+
         //Track the record of usage...
         mrExist.repurchaseLogs.push(formatedData);
+        mrExist.durationWise.push(durationRepurchaseEntry);
         mrExist.save();
 
         //Check the response...
