@@ -746,7 +746,7 @@ const mrAddNewBrand = async (req, res) => {
             brandName: Brands,
             repurchaseDate: formattedDate,
             doctorName: doctorExist.DoctorName,
-            patientName: patient.PatientName
+            patientName: patientExist.PatientName
         };
 
         //Track the record of usage...
