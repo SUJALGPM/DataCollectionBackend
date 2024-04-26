@@ -167,9 +167,12 @@ const dataPushToPatient = async (req, res) => {
                 }
             }
 
+            const repurchaseDate = new Date(data.dop);
+            const formattedDate = repurchaseDate.toISOString().split('T')[0];
+
             const durationRepurchaseEntry = {
                 brandName: data.selectedBrand ? data.selectedBrand.value : null,
-                repurchaseDate: new Date(data.dop),
+                repurchaseDate: formattedDate,
                 doctorName: doctorExist.DoctorName,
                 patientName: patient.PatientName
             };
