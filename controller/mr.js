@@ -14,6 +14,7 @@ const patient = require('../models/patient');
 const { format } = require('path');
 const moment = require('moment');
 
+
 const createMr = async (req, res) => {
     try {
         const { DIV, STATE, MRCODE, PASSWORD, MRNAME, HQ, DESG, DOJ, EFF_DATE, MOBILENO } = req.body;
@@ -708,9 +709,23 @@ const mrAddNewBrand = async (req, res) => {
         }
 
         //Check the flm exist or not..
-        const flmExist = await flmModel.findOne({ Mrs: mrExist._id });
+        const flmExist = await flmModel.findOne({ Mrs: { $in: mrExist._id } });
         if (!flmExist) {
             return res.status(404).send({ message: "Flm not found..!!" });
+        }
+
+
+        //Check the flm exist or not..
+        const slmExist = await slmModel.findOne({ Flm: { $in: flmExist._id } });
+        if (!slmExist) {
+            return res.status(404).send({ message: "Slm not found..!!" });
+        }
+
+        //Check the flm exist or not..
+        const adminExist = await AdminModel.findOne({ Slm: { $in: slmExist._id } });
+        console.log("existed admin :", adminExist);
+        if (!adminExist) {
+            return res.status(404).send({ message: "Admin not found..!!" });
         }
 
         //Calculated total...
@@ -751,15 +766,21 @@ const mrAddNewBrand = async (req, res) => {
         const durationRepurchaseEntry = {
             brandName: Brands,
             repurchaseDate: formattedDate,
+            slmName: slmExist.ZBMName,
+            flmName: flmExist.BDMName,
             mrName: mrExist.PSNAME,
             doctorName: doctorExist.DoctorName,
             patientName: patientExist.PatientName
         };
 
+
         //Track the record of usage...
         mrExist.repurchaseLogs.push(formatedData);
-        flmExist.durationWise.push(durationRepurchaseEntry);
-        mrExist.save();
+        await mrExist.save();
+
+        //Save popular mr repurchae wise...
+        adminExist.durationWise.push(durationRepurchaseEntry);
+        await adminExist.save();
 
         //Check the response...
         res.status(201).send({ message: "MR Successfully added new brand in patient...", success: true });

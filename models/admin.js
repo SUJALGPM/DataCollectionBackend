@@ -23,7 +23,8 @@ const adminSchema = new mongoose.Schema({
 
     Slm: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Slm' }
-    ]
+    ],
+    durationWise: []
 })
 
 module.exports = mongoose.model('admin', adminSchema)

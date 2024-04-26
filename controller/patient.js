@@ -3,6 +3,8 @@ const PatientModel = require("../models/patient");
 const BrandModel = require("../models/Brands");
 const MrModel = require("../models/mr");
 const flmModel = require("../models/Flm");
+const slmModel = require("../models/Slm");
+const AdminModel = require("../models/admin");
 const moment = require('moment');
 
 
@@ -135,9 +137,22 @@ const dataPushToPatient = async (req, res) => {
         }
 
         //Check the flm exist or not..
-        const flmExist = await flmModel.findOne({ Mrs: mrExist._id });
+        const flmExist = await flmModel.findOne({ Mrs: { $in: mrExist._id } });
         if (!flmExist) {
             return res.status(404).send({ message: "Flm not found..!!" });
+        }
+
+        //Check the flm exist or not..
+        const slmExist = await slmModel.findOne({ Flm: { $in: flmExist._id } });
+        if (!slmExist) {
+            return res.status(404).send({ message: "Slm not found..!!" });
+        }
+
+        //Check the flm exist or not..
+        const adminExist = await AdminModel.findOne({ Slm: { $in: slmExist._id } });
+        console.log("existed admin :", adminExist);
+        if (!adminExist) {
+            return res.status(404).send({ message: "Admin not found..!!" });
         }
 
         //Update API means add new repurchase....
@@ -181,14 +196,17 @@ const dataPushToPatient = async (req, res) => {
             const durationRepurchaseEntry = {
                 brandName: data.selectedBrand ? data.selectedBrand.value : null,
                 repurchaseDate: formattedDate,
+                slmName: slmExist.ZBMName,
+                flmName: flmExist.BDMName,
                 mrName: mrExist.PSNAME,
                 doctorName: doctorExist.DoctorName,
                 patientName: patient.PatientName
             };
             mrExist.repurchaseLogs.push(NewRepurchaseEntry);
-            flmExist.durationWise.push(durationRepurchaseEntry);
+            adminExist.durationWise.push(durationRepurchaseEntry);
         });
         await mrExist.save();
+        await adminExist.save();
 
         //Send rsponse if all ok....
         return res.json(200);

@@ -30,8 +30,7 @@ const flmModel = new mongoose.Schema({
     ],
     Mrs: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'MR' }
-    ],
-    durationWise: []
+    ]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Flm', flmModel);
