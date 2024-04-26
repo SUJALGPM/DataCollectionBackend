@@ -51,7 +51,7 @@ const mrSchema = new mongoose.Schema({
     ],
     doctorLogs: [],
     repurchaseLogs: [],
-    durationWise: [],
+    // durationWise: [],
     doctors: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' }
     ],

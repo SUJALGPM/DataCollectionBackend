@@ -2,6 +2,7 @@ const DoctorModel = require("../models/doctor");
 const PatientModel = require("../models/patient");
 const BrandModel = require("../models/Brands");
 const MrModel = require("../models/mr");
+const flmModel = require("../models/Flm");
 const moment = require('moment');
 
 
@@ -133,6 +134,12 @@ const dataPushToPatient = async (req, res) => {
             return res.status(404).send({ message: "MR not found..!!" });
         }
 
+        //Check the flm exist or not..
+        const flmExist = await flmModel.findOne({ Mrs: mrExist._id });
+        if (!flmExist) {
+            return res.status(404).send({ message: "Flm not found..!!" });
+        }
+
         //Update API means add new repurchase....
         repurchaseData.forEach(data => {
             const selectedBrand = data.selectedBrand ? data.selectedBrand.value : null;
@@ -174,11 +181,12 @@ const dataPushToPatient = async (req, res) => {
             const durationRepurchaseEntry = {
                 brandName: data.selectedBrand ? data.selectedBrand.value : null,
                 repurchaseDate: formattedDate,
+                mrName: mrExist.PSNAME,
                 doctorName: doctorExist.DoctorName,
                 patientName: patient.PatientName
             };
             mrExist.repurchaseLogs.push(NewRepurchaseEntry);
-            mrExist.durationWise.push(durationRepurchaseEntry);
+            flmExist.durationWise.push(durationRepurchaseEntry);
         });
         await mrExist.save();
 

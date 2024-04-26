@@ -707,6 +707,12 @@ const mrAddNewBrand = async (req, res) => {
             return res.status(404).send({ message: "Doctor Not Found..!!" });
         }
 
+        //Check the flm exist or not..
+        const flmExist = await flmModel.findOne({ Mrs: mrExist._id });
+        if (!flmExist) {
+            return res.status(404).send({ message: "Flm not found..!!" });
+        }
+
         //Calculated total...
         const calculateTotal = Price * NoDose;
 
@@ -745,13 +751,14 @@ const mrAddNewBrand = async (req, res) => {
         const durationRepurchaseEntry = {
             brandName: Brands,
             repurchaseDate: formattedDate,
+            mrName: mrExist.PSNAME,
             doctorName: doctorExist.DoctorName,
             patientName: patientExist.PatientName
         };
 
         //Track the record of usage...
         mrExist.repurchaseLogs.push(formatedData);
-        mrExist.durationWise.push(durationRepurchaseEntry);
+        flmExist.durationWise.push(durationRepurchaseEntry);
         mrExist.save();
 
         //Check the response...

@@ -1633,7 +1633,6 @@ const adminDetailDurationWise = async (req, res) => {
 
 }
 
-
 const adminMRdurationReport = async (req, res) => {
     try {
         const adminId = req.params.id;
@@ -1752,11 +1751,6 @@ const adminMRdurationReport = async (req, res) => {
         res.status(500).send({ message: "Internal Server Error", success: false });
     }
 };
-
-
-
-
-
 
 
 
