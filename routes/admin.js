@@ -50,7 +50,6 @@ router.get("/admin-mr-Data/:id", admingetMrId);
 router.get("/admin-doctor-list/:id", adminDoctorList);
 router.get("/admin-doctor-Data/:id", admingetDoctorId);
 router.get("/admin-patient-list/:id", adminPatientList);
-router.get("/admin-details-durationWise/:id", adminDetailDurationWise);
 router.get("/admin-mrDetail-duration/:id", adminMRdurationReport);
 
 
