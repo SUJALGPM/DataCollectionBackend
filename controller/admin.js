@@ -1633,6 +1633,212 @@ const adminDetailDurationWise = async (req, res) => {
 
 }
 
+// const adminMRdurationReport = async (req, res) => {
+//     try {
+//         const adminId = req.params.id;
+
+//         // Check admin id is getting or not..
+//         if (!adminId) {
+//             return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+//         }
+
+//         // Check admin exist or not..
+//         const adminExist = await adminModels.findById(adminId);
+//         if (!adminExist) {
+//             return res.status(401).send({ message: "Admin not found..!!!", success: false });
+//         }
+
+//         // Define yesterday's, last week's, and last month's dates
+//         const yesterday = new Date();
+//         yesterday.setDate(yesterday.getDate() - 1);
+//         const yesterdayDate = yesterday.toISOString().slice(0, 10);
+
+//         const lastWeek = new Date();
+//         lastWeek.setDate(lastWeek.getDate() - 7);
+//         const lastWeekDate = lastWeek.toISOString().slice(0, 10);
+
+//         const lastMonth = new Date();
+//         lastMonth.setDate(lastMonth.getDate() - 31);
+//         const lastMonthDate = lastMonth.toISOString().slice(0, 10);
+
+//         const brandWiseData = {};
+
+//         // Iterate through each brand in durationWise array
+//         for (const brandData of adminExist.durationWise) {
+//             const { brandName, repurchaseDate, mrName } = brandData;
+
+//             // Initialize brand if not present in brandWiseData
+//             if (!brandWiseData[brandName]) {
+//                 brandWiseData[brandName] = {
+//                     highest: { count: 0, mrname: null },
+//                     yesterday: { count: 0, mrname: null },
+//                     lastweek: { count: 0, mrname: null },
+//                     lastmonth: { count: 0, mrname: null },
+//                 };
+//             }
+
+
+//             // Update counts based on repurchase date and MR name
+//             if (repurchaseDate === yesterdayDate) {
+//                 console.log(`Incrementing yesterday count for ${brandName} - MR: ${mrName} DATE: ${repurchaseDate}`);
+//                 // Check if this repurchase count is higher than the current highest count for yesterday
+//                 if (brandWiseData[brandName].yesterday.count < brandWiseData[brandName].highest.count) {
+//                     brandWiseData[brandName].yesterday.count = brandWiseData[brandName].highest.count;
+//                     brandWiseData[brandName].yesterday.mrname = brandWiseData[brandName].highest.mrname;
+//                 } else {
+//                     // Update if the MR name has a higher count than the current "yesterday" count
+//                     if (brandWiseData[brandName].highest.count === 0 || brandWiseData[brandName].highest.count < brandWiseData[brandName].yesterday.count) {
+//                         brandWiseData[brandName].yesterday.count = brandWiseData[brandName].highest.count;
+//                         brandWiseData[brandName].yesterday.mrname = brandWiseData[brandName].highest.mrname;
+//                     }
+//                 }
+//             }
+
+
+//             if (repurchaseDate >= lastWeekDate) {
+//                 brandWiseData[brandName].lastweek.count++;
+//                 if (!brandWiseData[brandName].lastweek.mrname ||
+//                     brandWiseData[brandName].lastweek.count > brandWiseData[brandName].highest.count) {
+//                     brandWiseData[brandName].lastweek.mrname = mrName;
+//                 }
+//             }
+
+//             if (repurchaseDate >= lastMonthDate) {
+//                 brandWiseData[brandName].lastmonth.count++;
+//                 if (!brandWiseData[brandName].lastmonth.mrname ||
+//                     brandWiseData[brandName].lastmonth.count > brandWiseData[brandName].highest.count) {
+//                     brandWiseData[brandName].lastmonth.mrname = mrName;
+//                 }
+//             }
+
+//             // Update highest MR name based on actual counts
+//             if (brandWiseData[brandName].highest.count < brandWiseData[brandName].yesterday.count) {
+//                 brandWiseData[brandName].highest.count = brandWiseData[brandName].yesterday.count;
+//                 brandWiseData[brandName].highest.mrname = mrName;
+//             }
+//             if (brandWiseData[brandName].highest.count < brandWiseData[brandName].lastweek.count) {
+//                 brandWiseData[brandName].highest.count = brandWiseData[brandName].lastweek.count;
+//                 brandWiseData[brandName].highest.mrname = mrName;
+//             }
+//             if (brandWiseData[brandName].highest.count < brandWiseData[brandName].lastmonth.count) {
+//                 brandWiseData[brandName].highest.count = brandWiseData[brandName].lastmonth.count;
+//                 brandWiseData[brandName].highest.mrname = mrName;
+//             }
+//         }
+
+//         res.status(200).json({ BrandWiseDuration: brandWiseData });
+
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send({ message: "Internal Server Error", success: false });
+//     }
+// };
+
+let a;
+
+//Perfect running code yesterday count...
+// const adminMRdurationReport = async (req, res) => {
+//     try {
+//         const adminId = req.params.id;
+
+//         // Check admin id is getting or not..
+//         if (!adminId) {
+//             return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+//         }
+
+//         // Check admin exist or not..
+//         const adminExist = await adminModels.findById(adminId);
+//         if (!adminExist) {
+//             return res.status(401).send({ message: "Admin not found..!!!", success: false });
+//         }
+
+//         // Define yesterday's, last week's, and last month's dates
+//         const yesterday = new Date();
+//         yesterday.setDate(yesterday.getDate() - 1);
+//         const yesterdayDate = yesterday.toISOString().slice(0, 10);
+
+//         const lastWeek = new Date();
+//         lastWeek.setDate(lastWeek.getDate() - 7);
+//         const lastWeekDate = lastWeek.toISOString().slice(0, 10);
+
+//         const lastMonth = new Date();
+//         lastMonth.setDate(lastMonth.getDate() - 31);
+//         const lastMonthDate = lastMonth.toISOString().slice(0, 10);
+
+//         const brandWiseData = {};
+
+//         // Iterate through each brand in durationWise array
+//         for (const brandData of adminExist.durationWise) {
+//             const { brandName, repurchaseDate, mrName } = brandData;
+
+//             // Initialize brand if not present in brandWiseData
+//             if (!brandWiseData[brandName]) {
+//                 brandWiseData[brandName] = {
+//                     highest: { count: 0, mrname: null },
+//                     yesterday: { count: 0, mrname: null },
+//                     lastweek: { count: 0, mrname: null },
+//                     lastmonth: { count: 0, mrname: null },
+//                 };
+//             }
+
+//             if (repurchaseDate === yesterdayDate) {
+//                 console.log(`Incrementing yesterday count for ${brandName} - MR: ${mrName} DATE: ${repurchaseDate}`);
+//                 // Ensure brandWiseData[brandName][mrName] is initialized
+//                 if (!brandWiseData[brandName][mrName]) {
+//                     brandWiseData[brandName][mrName] = { count: 0 };
+//                 }
+//                 // Update yesterday's count for this MR
+//                 brandWiseData[brandName][mrName].count++;
+//                 // Check if this MR has a higher count than the current highest for yesterday
+//                 if (brandWiseData[brandName][mrName].count > brandWiseData[brandName].yesterday.count) {
+//                     brandWiseData[brandName].yesterday.count = brandWiseData[brandName][mrName].count;
+//                     brandWiseData[brandName].yesterday.mrname = mrName;
+//                 }
+//             }
+
+
+//             if (repurchaseDate >= lastWeekDate) {
+//                 brandWiseData[brandName].lastweek.count++;
+//                 if (!brandWiseData[brandName].lastweek.mrname ||
+//                     brandWiseData[brandName].lastweek.count > brandWiseData[brandName].highest.count) {
+//                     brandWiseData[brandName].lastweek.mrname = mrName;
+//                 }
+//             }
+
+//             if (repurchaseDate >= lastMonthDate) {
+//                 brandWiseData[brandName].lastmonth.count++;
+//                 if (!brandWiseData[brandName].lastmonth.mrname ||
+//                     brandWiseData[brandName].lastmonth.count > brandWiseData[brandName].highest.count) {
+//                     brandWiseData[brandName].lastmonth.mrname = mrName;
+//                 }
+//             }
+
+//             // Update highest MR name based on actual counts
+//             if (brandWiseData[brandName].highest.count < brandWiseData[brandName].yesterday.count) {
+//                 brandWiseData[brandName].highest.count = brandWiseData[brandName].yesterday.count;
+//                 brandWiseData[brandName].highest.mrname = mrName;
+//             }
+//             if (brandWiseData[brandName].highest.count < brandWiseData[brandName].lastweek.count) {
+//                 brandWiseData[brandName].highest.count = brandWiseData[brandName].lastweek.count;
+//                 brandWiseData[brandName].highest.mrname = mrName;
+//             }
+//             if (brandWiseData[brandName].highest.count < brandWiseData[brandName].lastmonth.count) {
+//                 brandWiseData[brandName].highest.count = brandWiseData[brandName].lastmonth.count;
+//                 brandWiseData[brandName].highest.mrname = mrName;
+//             }
+//         }
+
+//         res.status(200).json({ BrandWiseDuration: brandWiseData });
+
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send({ message: "Internal Server Error", success: false });
+//     }
+// };
+
+
+
+
 const adminMRdurationReport = async (req, res) => {
     try {
         const adminId = req.params.id;
@@ -1648,130 +1854,103 @@ const adminMRdurationReport = async (req, res) => {
             return res.status(401).send({ message: "Admin not found..!!!", success: false });
         }
 
-        // Define function to get yesterday's date, last week's date, and last month's date
-        const getYesterdayDate = () => {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            return yesterday;
-        };
+        // Define yesterday's, last week's, and last month's dates
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayDate = yesterday.toISOString().slice(0, 10);
 
-        const getLastWeekDate = () => {
-            const lastWeek = new Date();
-            lastWeek.setDate(lastWeek.getDate() - 7);
-            return lastWeek;
-        };
+        const lastWeek = new Date();
+        lastWeek.setDate(lastWeek.getDate() - 7);
+        const lastWeekDate = lastWeek.toISOString().slice(0, 10);
 
-        const getLastMonthDate = () => {
-            const lastMonth = new Date();
-            lastMonth.setDate(lastMonth.getDate() - 31);
-            return lastMonth;
-        };
+        const lastMonth = new Date();
+        lastMonth.setDate(lastMonth.getDate() - 31);
+        const lastMonthDate = lastMonth.toISOString().slice(0, 10);
 
-        // Initialize brand-wise totals object
-        const brandWiseMRRepurchase = {};
+        const brandWiseData = {};
 
-        // Loop through MRs under the admin
-        for (const Admins of adminExist.Slm) {
-            const slmExist = await slmModel.find({ _id: { $in: Admins } });
+        // Iterate through each brand in durationWise array
+        for (const brandData of adminExist.durationWise) {
+            const { brandName, repurchaseDate, mrName } = brandData;
 
-            for (const Slms of slmExist) {
-                const flmExist = await flmModel.find({ _id: { $in: Slms.Flm } });
+            // Initialize brand if not present in brandWiseData
+            if (!brandWiseData[brandName]) {
+                brandWiseData[brandName] = {
+                    highest: { count: 0, mrname: null },
+                    yesterday: { count: 0, mrname: null },
+                    lastweek: { count: 0, mrname: null },
+                    lastmonth: { count: 0, mrname: null },
+                };
+            }
 
-                for (const Flms of flmExist) {
-                    const mrExist = await MrModel.find({ _id: { $in: Flms.Mrs } });
+            if (repurchaseDate === yesterdayDate) {
+                // console.log(`Incrementing yesterday count for ${brandName} - MR: ${mrName} DATE: ${repurchaseDate}`);
 
-                    for (const mr of mrExist) {
-                        if (!mr.durationWise || mr.durationWise.length === 0) {
-                            continue;
-                        }
-
-                        const brandName = mr.durationWise[0].brandName;
-
-                        // Check if brandName already exists in totals object, if not, initialize it
-                        if (!brandWiseMRRepurchase[brandName]) {
-                            brandWiseMRRepurchase[brandName] = {
-                                highestRepurchase: { repurchaseTotal: 0, MRName: '' },
-                                previousDay: { repurchaseTotal: 0, MRName: '' },
-                                lastSevenDays: { repurchaseTotal: 0, MRName: '' },
-                                lastMonth: { repurchaseTotal: 0, MRName: '' }
-                            };
-                        }
-
-                        // Calculate repurchase totals for yesterday, last 7 days, and last 31 days
-                        const yesterday = getYesterdayDate();
-                        const lastWeek = getLastWeekDate();
-                        const lastMonth = getLastMonthDate();
-
-                        const repurchaseYesterday = mr.durationWise.filter(
-                            (item) => new Date(item.repurchaseDate) >= yesterday
-                        );
-                        const repurchaseLastWeek = mr.durationWise.filter(
-                            (item) => new Date(item.repurchaseDate) >= lastWeek
-                        );
-                        const repurchaseLastMonth = mr.durationWise.filter(
-                            (item) => new Date(item.repurchaseDate) >= lastMonth
-                        );
-
-                        // Update brand-wise totals object with repurchase totals and MR names
-                        brandWiseMRRepurchase[brandName].previousDay.repurchaseTotal += repurchaseYesterday.length;
-                        brandWiseMRRepurchase[brandName].lastSevenDays.repurchaseTotal += repurchaseLastWeek.length;
-                        brandWiseMRRepurchase[brandName].lastMonth.repurchaseTotal += repurchaseLastMonth.length;
-
-                        // Update highest repurchase MR name if applicable
-                        if (repurchaseYesterday.length > brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal) {
-                            brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal = repurchaseYesterday.length;
-                            brandWiseMRRepurchase[brandName].highestRepurchase.MRName = mr.PSNAME;
-                        }
-                        if (repurchaseLastWeek.length > brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal) {
-                            brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal = repurchaseLastWeek.length;
-                            brandWiseMRRepurchase[brandName].highestRepurchase.MRName = mr.PSNAME;
-                        }
-                        if (repurchaseLastMonth.length > brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal) {
-                            brandWiseMRRepurchase[brandName].highestRepurchase.repurchaseTotal = repurchaseLastMonth.length;
-                            brandWiseMRRepurchase[brandName].highestRepurchase.MRName = mr.PSNAME;
-                        }
-                    }
+                // Ensure brandWiseData[brandName][mrName] is initialized
+                if (!brandWiseData[brandName][mrName]) {
+                    brandWiseData[brandName][mrName] = { count: 0 };
                 }
+                // Update yesterday's count for this MR
+                brandWiseData[brandName][mrName].count++;
+                // Check if this MR has a higher count than the current highest for yesterday
+                if (brandWiseData[brandName][mrName].count > brandWiseData[brandName].yesterday.count) {
+                    brandWiseData[brandName].yesterday.count = brandWiseData[brandName][mrName].count;
+                    brandWiseData[brandName].yesterday.mrname = mrName;
+                }
+            }
+
+
+            if (repurchaseDate >= lastWeekDate) {
+                console.log(`Incrementing last week count for ${brandName} - MR: ${mrName} DATE: ${repurchaseDate}`);
+
+                // Ensure brandWiseData[brandName].lastweek is initialized
+                if (!brandWiseData[brandName].lastweek) {
+                    brandWiseData[brandName].lastweek = { count: 0 };
+                }
+
+                // Update last week's count for this MR
+                brandWiseData[brandName].lastweek.count++;
+
+                // Check if this MR has a higher count than the current highest for last week
+                if (
+                    !brandWiseData[brandName].lastweek.mrname ||
+                    brandWiseData[brandName].lastweek.count > brandWiseData[brandName].highest.count
+                ) {
+                    brandWiseData[brandName].lastweek.mrname = mrName;
+                }
+            }
+
+
+            if (repurchaseDate >= lastMonthDate) {
+                brandWiseData[brandName].lastmonth.count++;
+                if (!brandWiseData[brandName].lastmonth.mrname ||
+                    brandWiseData[brandName].lastmonth.count > brandWiseData[brandName].highest.count) {
+                    brandWiseData[brandName].lastmonth.mrname = mrName;
+                }
+            }
+
+            // Update highest MR name based on actual counts
+            if (brandWiseData[brandName].highest.count < brandWiseData[brandName].yesterday.count) {
+                brandWiseData[brandName].highest.count = brandWiseData[brandName].yesterday.count;
+                brandWiseData[brandName].highest.mrname = mrName;
+            }
+            if (brandWiseData[brandName].highest.count < brandWiseData[brandName].lastweek.count) {
+                brandWiseData[brandName].highest.count = brandWiseData[brandName].lastweek.count;
+                brandWiseData[brandName].highest.mrname = mrName;
+            }
+            if (brandWiseData[brandName].highest.count < brandWiseData[brandName].lastmonth.count) {
+                brandWiseData[brandName].highest.count = brandWiseData[brandName].lastmonth.count;
+                brandWiseData[brandName].highest.mrname = mrName;
             }
         }
 
-        // Now update the MRName for each period based on highest repurchase
-        Object.keys(brandWiseMRRepurchase).forEach((brand) => {
-            const highestRepurchase = brandWiseMRRepurchase[brand].highestRepurchase;
+        res.status(200).json({ BrandWiseDuration: brandWiseData });
 
-            brandWiseMRRepurchase[brand].previousDay.MRName = highestRepurchase.MRName;
-            brandWiseMRRepurchase[brand].lastSevenDays.MRName = highestRepurchase.MRName;
-            brandWiseMRRepurchase[brand].lastMonth.MRName = highestRepurchase.MRName;
-        });
-
-        // Now brandWiseMRRepurchase object contains brand-wise MR repurchase totals with highest repurchase MR names for each period
-        res.status(200).json({ brandWiseMRRepurchase, success: true });
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: "Internal Server Error", success: false });
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
