@@ -9,7 +9,6 @@ const apicache = require("apicache")
 
 
 dotenv.config();
-
 app.use(cors());
 
 
@@ -37,6 +36,7 @@ const adminRouter = require("./routes/admin");
 const tlmRouter = require("./routes/Tlm");
 const slmRouter = require("./routes/Slm");
 const flmRouter = require("./routes/Flm");
+
 
 app.use('/api', mrRouter);
 app.use('/api', doctorRouter);
