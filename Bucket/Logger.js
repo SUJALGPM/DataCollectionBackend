@@ -50,9 +50,9 @@ const logger = createLogger({
 
         new transports.MongoDB({
             level: 'verbose',
-                db: MONGO_URL,
-                options: { useUnifiedTopology: true },
-                collection: 'ServerLogs',
+            db: MONGO_URL,
+            options: { useUnifiedTopology: true },
+            collection: 'ServerLogs',
             format: DatabaseCustomFormat
         })
     ]
@@ -66,7 +66,7 @@ const childLogger = logger.child({ module: 'exampleModule' });
 //Create middleware for whole express application...
 const loggerMiddleware = (req, res, next) => {
     // const currentTime = new Date().toLocaleString('en-US', { timeZone: 'UTC' });
-    logger.verbose(`${process.pid} ${req.method} ${req.url} :`, { body: req.body });
+    logger.verbose(`${req.method} ${req.url} :`, { body: req.body });
     res.on('finish', () => {
         logger.verbose(`${req.method} ${req.url} - ${res.statusCode} `);
     });

@@ -5,17 +5,14 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require("dotenv");
 const apicache = require("apicache")
-const { loggerMiddleware } = require("./Bucket/Logger");
+const { loggerMiddleware, logger } = require("./Bucket/Logger");
 
 
 dotenv.config();
 app.use(cors());
-
-
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(express.json())
-// testing
-app.get('/', (req, res) => res.send("hello World"))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(loggerMiddleware);
 
 try {
     mongoose.connect(process.env.DATABASE, {
@@ -46,9 +43,6 @@ app.use('/api', tlmRouter);
 app.use('/api', slmRouter);
 app.use('/api', flmRouter);
 
-
-// Use loggerMiddleware before defining routes
-app.use(loggerMiddleware);
 
 
 
