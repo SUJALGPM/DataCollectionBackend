@@ -11,6 +11,9 @@ const mongoose = require('mongoose');
 const xlsx = require("xlsx");
 const patient = require("../models/patient");
 const SECRET = process.env.SECRET;
+const moment = require('moment');
+
+
 
 
 const handleAdminCreateAccounts = async (req, res) => {
@@ -1650,6 +1653,146 @@ const adminMRdurationReport = async (req, res) => {
     }
 };
 
+// Function to check if the date is in the expected format "dd-mm-yyyy"
+// function isValidDate(dateString) {
+//     const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+//     return dateRegex.test(dateString);
+// }
+
+function isValidDate(dateString) {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+    return dateRegex.test(dateString);
+}
+
+const formatDate = (dateString) => {
+    if (isValidDate(dateString)) {
+        return dateString.replace(/\//g, '-'); // Replace all slashes with dashes
+    } else {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+    }
+}
+
+const adminBranchDetailReport = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        //Check admin id is getting or not..
+        if (!adminId) {
+            return res.status(404).send({ message: "Admin ID not found...!!", success: false });
+        }
+
+        //check admin exist or not..
+        const adminExist = await adminModels.findById(adminId).populate({
+            path: 'Slm',
+            model: 'Slm',
+            populate: {
+                path: 'Flm',
+                model: 'Flm',
+                populate: {
+                    path: 'Mrs',
+                    model: 'MR',
+                    populate: {
+                        path: 'doctors',
+                        model: 'Doctor',
+                        populate: {
+                            path: 'patients',
+                            model: 'Patient'
+                        }
+                    }
+                }
+            }
+        });
+
+
+        if (!adminExist) {
+            return res.status(401).send({ message: "Admin not found..!!!", success: false });
+        }
+
+        //Store in empty conatiner...
+        const detailPatientlist = [];
+
+        //Loop Data of mr...
+        for (const slm of adminExist.Slm) {
+            for (const flm of slm.Flm) {
+                for (const mrs of flm.Mrs) {
+                    for (const doctors of mrs.doctors) {
+                        for (const patients of doctors.patients) {
+                            console.log(patients)
+                            for (repurchase of patients.Repurchase) {
+
+                                const report = {
+                                    AID: adminExist.AdminId || '',
+                                    ANAME: adminExist.Name || '',
+                                    AROLE: adminExist.role || '',
+                                    AGENDER: adminExist.Gender || '',
+                                    ACONTACT: adminExist.MobileNumber || '',
+                                    SID: slm.SLMEmpID || '',
+                                    SNAME: slm.ZBMName || '',
+                                    FID: flm.FLMEmpID || '',
+                                    FNAME: flm.BDMName || '',
+                                    MID: mrs.EMPID || '',
+                                    MNAME: mrs.PSNAME || '',
+                                    MPASS: mrs.Password || '',
+                                    MNUMBER: mrs.Number || '',
+                                    MREGION: mrs.Region || '',
+                                    MHQ: mrs.HQ || '',
+                                    MDOJ: mrs.DOJ || '',
+                                    MDESG: mrs.DESIGNATION || '',
+                                    MDOC: moment(mrs.doc).format('DD-MM-YYYY') || '',
+                                    DRNAME: doctors.DoctorName || '',
+                                    DRSCCODE: doctors.SCCode || '',
+                                    DRSPEC: doctors.Specialty || '',
+                                    DRPLACE: doctors.Place || '',
+                                    DRCLASS: doctors.CLASS || '',
+                                    DRVF: doctors.VF || '',
+                                    DRPOTENTIAL: doctors.DoctorPotential || '',
+                                    DRSTATUS: doctors.DoctorStatus || '',
+                                    DRDOC: moment(doctors.doc).format('DD-MM-YYYY') || '',
+                                    PNAME: patients.PatientName || '',
+                                    PNUMBER: patients.MobileNumber || '',
+                                    PAGE: patients.Age || '',
+                                    PGENDER: patients.Gender || '',
+                                    PLOCATION: patients.Location || '',
+                                    PSTATUS: patients.PatientStatus || '',
+                                    PREASON: patients.Reason || '',
+                                    PTYPE: patients.PatientType || '',
+                                    PDURATIONTHERAPY: repurchase.DurationOfTherapy || '',
+                                    PTOTALCARTPURCHASE: repurchase.TotolCartiridgesPurchase || '',
+                                    // PDOC: isValidDate(repurchase.DateOfPurchase) ? repurchase.DateOfPurchase : new Date(repurchase.DateOfPurchase).toLocaleDateString('en-GB') || '',
+                                    // PEOC: isValidDate(repurchase.EndOfPurchase) ? repurchase.EndOfPurchase : new Date(repurchase.EndOfPurchase).toLocaleDateString('en-GB') || '',
+                                    PDOC: formatDate(repurchase.DateOfPurchase),
+                                    // EDOC: formatDate(repurchase.EndOfPurchase),
+                                    PTHERAPYSTATUS: repurchase.TherapyStatus || '',
+                                    PDELIVERY: repurchase.Delivery || '',
+                                    PTM: repurchase.TM || '',
+                                    PSUBCOMMENTS: repurchase.SubComments || '',
+                                    PUNITPRESCRIBE: repurchase.UnitsPrescribe || '',
+                                    PINDICATION: repurchase.Indication || '',
+                                    PPRICE: repurchase.Price || '',
+                                    PNODOSE: repurchase.NoDose || '',
+                                    PTOTAL: repurchase.Total || '',
+                                    PBRANDS: repurchase.Brands || '',
+                                }
+                                detailPatientlist.push(report);
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //Send the response of loop data...
+        res.status(201).json(detailPatientlist);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Internal Server Error", success: false });
+    }
+}
+
+
 
 
 
@@ -1675,5 +1818,6 @@ module.exports = {
     adminDoctorList,
     admingetDoctorId,
     adminPatientList,
-    adminMRdurationReport
+    adminMRdurationReport,
+    adminBranchDetailReport
 }

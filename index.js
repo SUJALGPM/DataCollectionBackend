@@ -5,7 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require("dotenv");
 const apicache = require("apicache")
-
+const { loggerMiddleware } = require("./Bucket/Logger");
 
 
 dotenv.config();
@@ -47,6 +47,8 @@ app.use('/api', slmRouter);
 app.use('/api', flmRouter);
 
 
+// Use loggerMiddleware before defining routes
+app.use(loggerMiddleware);
 
 
 
