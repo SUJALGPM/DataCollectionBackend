@@ -26,3 +26,71 @@
 05-03-2024 12:53:54 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 200  
 05-03-2024 12:54:04 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
 05-03-2024 12:54:04 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 13:24:07 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rohit Sharma","MobileNumber":"4679179879","Gender":"Male","PatientAge":"12","Year":null,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Invalid Date","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"8","UnitsPrescribe":"5","totalCartridgesPurchase":"6","dop":"2024-05-03","eop":"2024-05-16","durationOfTherapy":"6","delivery":"Self","Price":"455","NoDose":"23"}]}
+05-03-2024 13:24:07 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 500  
+05-03-2024 13:24:57 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rohit Sharma","MobileNumber":"4679179879","Gender":"Male","PatientAge":"12","Year":null,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Invalid Date","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"8","UnitsPrescribe":"5","totalCartridgesPurchase":"6","dop":"2024-05-03","eop":"2024-05-16","durationOfTherapy":"6","delivery":"Self","Price":"455","NoDose":"23"}]}
+05-03-2024 13:24:57 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 500  
+05-03-2024 13:26:19 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rohit Sharma","MobileNumber":"4679179879","Gender":"Male","PatientAge":"12","Year":null,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Invalid Date","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"8","UnitsPrescribe":"5","totalCartridgesPurchase":"6","dop":"2024-05-03","eop":"2024-05-16","durationOfTherapy":"6","delivery":"Self","Price":"455","NoDose":"23"}]}
+05-03-2024 13:26:20 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 201  
+05-03-2024 13:30:37 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rahul Jha1","MobileNumber":"4671879879","Gender":"Male","PatientAge":"45","Year":2001,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Apr","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"5","UnitsPrescribe":"6","totalCartridgesPurchase":"2","dop":"2024-05-03","eop":"2024-05-21","durationOfTherapy":"9","delivery":"Self","Price":"6","NoDose":"4"}]}
+05-03-2024 13:30:37 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 500  
+05-03-2024 13:31:57 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rahul Jha1","MobileNumber":"4671879879","Gender":"Male","PatientAge":"45","Year":2001,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Apr","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"5","UnitsPrescribe":"6","totalCartridgesPurchase":"2","dop":"2024-05-03","eop":"2024-05-21","durationOfTherapy":"9","delivery":"Self","Price":"6","NoDose":"4"}]}
+05-03-2024 13:31:58 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 500  
+05-03-2024 13:35:30 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rahul Jha1","MobileNumber":"4671879879","Gender":"Male","PatientAge":"45","Year":2001,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Apr","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"5","UnitsPrescribe":"6","totalCartridgesPurchase":"2","dop":"2024-05-03","eop":"2024-05-21","durationOfTherapy":"9","delivery":"Self","Price":"6","NoDose":"4"}]}
+05-03-2024 13:35:30 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 500  
+05-03-2024 13:54:15 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rahul Jha1","MobileNumber":"4671879879","Gender":"Male","PatientAge":"45","Year":2001,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Apr","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"5","UnitsPrescribe":"6","totalCartridgesPurchase":"2","dop":"2024-05-03","eop":"2024-05-21","durationOfTherapy":"9","delivery":"Self","Price":"6","NoDose":"4"}]}
+05-03-2024 13:54:15 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 500  
+05-03-2024 13:57:18 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rahul Jha1","MobileNumber":"4671879879","Gender":"Male","PatientAge":"45","Year":2001,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Apr","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"5","UnitsPrescribe":"6","totalCartridgesPurchase":"2","dop":"2024-05-03","eop":"2024-05-21","durationOfTherapy":"9","delivery":"Self","Price":"6","NoDose":"4"}]}
+05-03-2024 13:57:18 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 201  
+05-03-2024 14:04:23 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rohit Sharma","MobileNumber":"6147897197","Gender":"Male","PatientAge":"45","Year":1956,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"Jan","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"TOFASHINE","label":"TOFASHINE"},"Indication":"23","UnitsPrescribe":"4","totalCartridgesPurchase":"56","dop":"2024-05-03","eop":"2024-05-16","durationOfTherapy":"3","delivery":"Self","Price":"23","NoDose":"56"}]}
+05-03-2024 14:04:24 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 201  
+05-03-2024 14:07:38 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 14:07:39 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 14:19:55 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 14:19:55 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 200  
+05-03-2024 15:17:50 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:17:50 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:21:40 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:21:40 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:27:37 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:27:37 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 200  
+05-03-2024 15:33:10 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:10 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 200  
+05-03-2024 15:33:54 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:54 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:54 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:54 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:55 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:55 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:55 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:55 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:55 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:55 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:56 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:56 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:56 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:56 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:56 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:56 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:33:56 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:33:56 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:34:28 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:34:28 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 200  
+05-03-2024 15:34:29 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:34:29 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:35:33 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:35:33 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:36:34 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:36:34 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 200  
+05-03-2024 15:57:15 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:57:16 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 200  
+05-03-2024 15:57:18 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 15:57:18 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 15:58:37 [VERBOSE] POST /api/create-patient/65f81042f5b6ab6eed5f0960 : {"PatientName":"Rohit Sharma","MobileNumber":"4787986714","Gender":"Male","PatientAge":"12","Year":2001,"Location":"MUMBAI","Indication":"","unitsPrescribe":0,"Month":"May","Price":"","Doses":"","PatientType":"New","PatientStatus":false,"selectedBrand":"","DurationOfTherapy":"","noofunitspurchased":"","DateOfPurchase":"","EndOfPurchase":"","TherapyStatus":"","Delivery":"","TM":"","brandCount":0,"repurchaseData":[{"selectedBrand":{"value":"INFIMAB","label":"INFIMAB"},"Indication":"5","UnitsPrescribe":"65","totalCartridgesPurchase":"4","dop":"2024-05-03","eop":"2024-05-24","durationOfTherapy":"6","delivery":"Self","Price":"1500","NoDose":"5"}]}
+05-03-2024 15:58:38 [VERBOSE] POST /create-patient/65f81042f5b6ab6eed5f0960 - 201  
+05-03-2024 16:04:14 [VERBOSE] GET /api/admin-branch-patient-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 16:04:14 [VERBOSE] GET /admin-branch-patient-duration/65f2eefd208eb8cf60102793 - 200  
+05-03-2024 16:05:50 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 16:05:50 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  
+05-03-2024 16:05:57 [VERBOSE] GET /api/admin-mrDetail-duration/65f2eefd208eb8cf60102793 : {}
+05-03-2024 16:05:57 [VERBOSE] GET /admin-mrDetail-duration/65f2eefd208eb8cf60102793 - 304  

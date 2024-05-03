@@ -14,6 +14,7 @@ const createPatients = async (req, res) => {
         const { PatientName, MobileNumber, Gender, Location, PatientAge, Reason, PatientType, Month, Year, PatientStatus, DurationOfTherapy, TotolCartiridgesPurchase, DateOfPurchase, Delivery, Demo, TherapyStatus, TM, selectedOptions, brandCount, repurchaseData } = req.body
         const id = req.params['id'];
 
+
         //Check the doctor exist or not....
         const doctor = await DoctorModel.findById({ _id: id });
         if (!doctor) return res.status(400).json({
@@ -41,7 +42,6 @@ const createPatients = async (req, res) => {
 
         //Check the flm exist or not..
         const adminExist = await AdminModel.findOne({ Slm: { $in: slmExist._id } });
-        console.log("existed admin :", adminExist);
         if (!adminExist) {
             return res.status(404).send({ message: "Admin not found..!!" });
         }
@@ -103,17 +103,17 @@ const createPatients = async (req, res) => {
                 }
             };
 
-            const repurchaseDate = new Date(data.dop);
-            const formattedDate = repurchaseDate.toISOString().split('T')[0];
+            // const repurchaseDate = new Date(data.dop);
+            // const formattedDate = repurchaseDate.toISOString().split('T')[0];
 
-            //Popular mr as per repurchase...
+            // //Popular mr as per patient...
             const durationPatientEntry = {
                 brandName: data.selectedBrand ? data.selectedBrand.value : null,
-                repurchaseDate: formattedDate,
+                repurchaseDate: data.dop,
                 slmName: slmExist.ZBMName,
                 flmName: flmExist.BDMName,
                 mrName: mrExist.PSNAME,
-                doctorName: doctorExist.DoctorName,
+                doctorName: doctor.DoctorName,
                 patientName: patient.PatientName,
                 patientStatus: patient.PatientStatus,
             };
@@ -122,6 +122,7 @@ const createPatients = async (req, res) => {
             adminExist.patientDuration.push(durationPatientEntry);
         });
         await mrExist.save();
+        await adminExist.save();
 
         //Send the response....
         return res.status(201).json({ success: true, message: 'Patient created and associated with Doctor' });
