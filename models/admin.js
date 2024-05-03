@@ -24,7 +24,8 @@ const adminSchema = new mongoose.Schema({
     Slm: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Slm' }
     ],
-    durationWise: []
+    durationWise: [],
+    patientDuration: []
 })
 
 module.exports = mongoose.model('admin', adminSchema)

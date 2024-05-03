@@ -27,6 +27,25 @@ const createPatients = async (req, res) => {
             return res.status(404).send({ message: "MR Not Found...!!!", success: false });
         }
 
+        //Check the flm exist or not..
+        const flmExist = await flmModel.findOne({ Mrs: { $in: mrExist._id } });
+        if (!flmExist) {
+            return res.status(404).send({ message: "Flm not found..!!" });
+        }
+
+        //Check the flm exist or not..
+        const slmExist = await slmModel.findOne({ Flm: { $in: flmExist._id } });
+        if (!slmExist) {
+            return res.status(404).send({ message: "Slm not found..!!" });
+        }
+
+        //Check the flm exist or not..
+        const adminExist = await AdminModel.findOne({ Slm: { $in: slmExist._id } });
+        console.log("existed admin :", adminExist);
+        if (!adminExist) {
+            return res.status(404).send({ message: "Admin not found..!!" });
+        }
+
         // const brands = selectedOptions.map(brand => brand.value);
         const patient = new PatientModel({
             PatientName: PatientName,
@@ -83,7 +102,24 @@ const createPatients = async (req, res) => {
                     Total: data.Price * data.NoDose
                 }
             };
+
+            const repurchaseDate = new Date(data.dop);
+            const formattedDate = repurchaseDate.toISOString().split('T')[0];
+
+            //Popular mr as per repurchase...
+            const durationPatientEntry = {
+                brandName: data.selectedBrand ? data.selectedBrand.value : null,
+                repurchaseDate: formattedDate,
+                slmName: slmExist.ZBMName,
+                flmName: flmExist.BDMName,
+                mrName: mrExist.PSNAME,
+                doctorName: doctorExist.DoctorName,
+                patientName: patient.PatientName,
+                patientStatus: patient.PatientStatus,
+            };
+
             mrExist.repurchaseLogs.push(NewPatientRepurchaseEntry);
+            adminExist.patientDuration.push(durationPatientEntry);
         });
         await mrExist.save();
 
