@@ -825,6 +825,7 @@ const mrGetDataBrandWise = async (req, res) => {
             INFIMABDoctor: 0,
             TOFASHINEDoctor: 0,
             HEADONDoctor: 0,
+            HUMIMABDoctor: 0,
         };
 
         mrWithDoctors.doctors.forEach((doctor) => {
@@ -894,6 +895,10 @@ const mrGetDataBrandWise = async (req, res) => {
 
             if (doctor.patients.some((patient) => patient.Repurchase.some((purchase) => purchase.Brands.includes('HEADON')))) {
                 doctorCounts.HEADONDoctor += 1;
+            }
+
+            if (doctor.patients.some((patient) => patient.Repurchase.some((purchase) => purchase.Brands.includes('HUMIMAB-HC')))) {
+                doctorCounts.HUMIMABDoctor += 1;
             }
         });
 
