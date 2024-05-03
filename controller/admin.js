@@ -1545,7 +1545,7 @@ const adminPatientList = async (req, res) => {
     }
 }
 
-//Working code duration yesterday - month - year......
+//Working code duration yesterday - month - year...... MR API DURATION ⚡
 const adminMRdurationReport = async (req, res) => {
     try {
         const adminId = req.params.id;
@@ -1566,13 +1566,13 @@ const adminMRdurationReport = async (req, res) => {
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayDate = yesterday.toISOString().slice(0, 10);
 
-        const lastWeek = new Date();
-        lastWeek.setDate(lastWeek.getDate() - 7);
-        const lastWeekDate = lastWeek.toISOString().slice(0, 10);
-
         const lastMonth = new Date();
         lastMonth.setDate(lastMonth.getDate() - 31);
         const lastMonthDate = lastMonth.toISOString().slice(0, 10);
+
+        const lastYear = new Date();
+        lastYear.setDate(lastYear.getDate() - 365);
+        const lastYearDate = lastYear.toISOString().slice(0, 10);
 
         const brandWiseData = {};
 
@@ -1586,8 +1586,8 @@ const adminMRdurationReport = async (req, res) => {
                 brandWiseData[brandName] = {
                     TotalrRepurchase: 0,
                     yesterday: { count: 0, mrname: null },
-                    lastweek: { count: 0, mrname: null },
                     lastmonth: { count: 0, mrname: null },
+                    lastyear: { count: 0, mrname: null },
                 };
             }
 
@@ -1614,21 +1614,6 @@ const adminMRdurationReport = async (req, res) => {
                 }
             }
 
-            if (repurchaseDate >= lastWeekDate) {
-                // console.log(`Incrementing last week count for ${brandName} - MR: ${mrName} DATE: ${repurchaseDate}`);
-
-                // Increment last week's count for this MR
-                brandWiseData[brandName].lastweek[mrName] = brandWiseData[brandName].lastweek[mrName] || { count: 0 };
-                brandWiseData[brandName].lastweek[mrName].count++;
-
-                // Update highest count and MR name for this brand if needed
-                if (brandWiseData[brandName].lastweek[mrName].count > brandWiseData[brandName].lastweek.count) {
-                    console.log()
-                    brandWiseData[brandName].lastweek.count = brandWiseData[brandName].lastweek[mrName].count;
-                    brandWiseData[brandName].lastweek.mrname = mrName;
-                }
-            }
-
             if (repurchaseDate >= lastMonthDate) {
                 // console.log(`Incrementing last week count for ${brandName} - MR: ${mrName} DATE: ${repurchaseDate}`);
 
@@ -1644,6 +1629,19 @@ const adminMRdurationReport = async (req, res) => {
                 }
             }
 
+            if (repurchaseDate >= lastYearDate) {
+                // console.log(`Incrementing last week count for ${brandName} - MR: ${mrName} DATE: ${repurchaseDate}`);
+
+                // Increment last week's count for this MR
+                brandWiseData[brandName].lastyear[mrName] = brandWiseData[brandName].lastyear[mrName] || { count: 0 };
+                brandWiseData[brandName].lastyear[mrName].count++;
+
+                // Update highest count and MR name for this brand if needed
+                if (brandWiseData[brandName].lastyear[mrName].count > brandWiseData[brandName].lastyear.count) {
+                    brandWiseData[brandName].lastyear.count = brandWiseData[brandName].lastyear[mrName].count;
+                    brandWiseData[brandName].lastyear.mrname = mrName;
+                }
+            }
         }
 
         res.status(200).json({ BrandWiseDuration: brandWiseData });
@@ -1654,6 +1652,7 @@ const adminMRdurationReport = async (req, res) => {
     }
 };
 
+//Working code duration yesterday - month - year...... PATIENT API DURATION ⚡
 const adminPatientDurationReport = async (req, res) => {
     try {
         const adminId = req.params.id;
@@ -1755,6 +1754,128 @@ const adminPatientDurationReport = async (req, res) => {
     }
 };
 
+//Combine api of adminMRdurationReport + adminPatientDurationReport = CombineOutput... 
+const adminMrPatientDurationReport = async(req,res)=>{
+    try {
+        const adminId = req.params.id;
+
+        // Check if adminId is provided and valid
+        if (!adminId) {
+            return res.status(404).json({ message: "Admin ID not found...!!", success: false });
+        }
+
+        // Fetch the admin details to check if they exist
+        const adminExist = await adminModels.findById(adminId);
+        if (!adminExist) {
+            return res.status(401).json({ message: "Admin not found..!!!", success: false });
+        }
+
+        // Define dates for yesterday, last month, and last year
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayDate = yesterday.toISOString().slice(0, 10);
+
+        const lastMonth = new Date();
+        lastMonth.setDate(lastMonth.getDate() - 31);
+        const lastMonthDate = lastMonth.toISOString().slice(0, 10);
+
+        const lastYear = new Date();
+        lastYear.setDate(lastYear.getDate() - 365);
+        const lastYearDate = lastYear.toISOString().slice(0, 10);
+
+        const brandWiseData = {};
+
+        // Iterate through each brand in adminExist.durationWise
+        for (const brandData of adminExist.durationWise) {
+            const { brandName, repurchaseDate, mrName } = brandData;
+
+            // Initialize brand if not present in brandWiseData
+            if (!brandWiseData[brandName]) {
+                brandWiseData[brandName] = {
+                    TotalrRepurchase: 0,
+                    yesterday: { count: 0, mrname: null, patientCount: 0 },
+                    lastmonth: { count: 0, mrname: null, patientCount: 0 },
+                    lastYear: { count: 0, mrname: null, patientCount: 0 },
+                };
+            }
+
+            // Increment total repurchase count for this brand
+            brandWiseData[brandName].TotalrRepurchase++;
+
+            // Handle MR counts for each duration
+            if (repurchaseDate === yesterdayDate) {
+                if (!brandWiseData[brandName][mrName]) {
+                    brandWiseData[brandName][mrName] = { count: 0 };
+                }
+                brandWiseData[brandName][mrName].count++;
+
+                if (brandWiseData[brandName][mrName].count > brandWiseData[brandName].yesterday.count) {
+                    brandWiseData[brandName].yesterday.count = brandWiseData[brandName][mrName].count;
+                    brandWiseData[brandName].yesterday.mrname = mrName;
+                }
+            }
+
+            if (repurchaseDate >= lastMonthDate) {
+                if (!brandWiseData[brandName].lastmonth[mrName]) {
+                    brandWiseData[brandName].lastmonth[mrName] = { count: 0 };
+                }
+                brandWiseData[brandName].lastmonth[mrName].count++;
+
+                if (brandWiseData[brandName].lastmonth[mrName].count > brandWiseData[brandName].lastmonth.count) {
+                    brandWiseData[brandName].lastmonth.count = brandWiseData[brandName].lastmonth[mrName].count;
+                    brandWiseData[brandName].lastmonth.mrname = mrName;
+                }
+            }
+
+            if (repurchaseDate >= lastYearDate) {
+                if (!brandWiseData[brandName].lastYear[mrName]) {
+                    brandWiseData[brandName].lastYear[mrName] = { count: 0 };
+                }
+                brandWiseData[brandName].lastYear[mrName].count++;
+
+                if (brandWiseData[brandName].lastYear[mrName].count > brandWiseData[brandName].lastYear.count) {
+                    brandWiseData[brandName].lastYear.count = brandWiseData[brandName].lastYear[mrName].count;
+                    brandWiseData[brandName].lastYear.mrname = mrName;
+                }
+            }
+        }
+
+        // Handle patient counts for each duration
+        for (const patientData of adminExist.patientDuration) {
+            const { brandName, repurchaseDate } = patientData;
+
+            // Initialize brand if not present in brandWiseData
+            if (!brandWiseData[brandName]) {
+                brandWiseData[brandName] = {
+                    yesterday: { patientCount: 0 },
+                    lastmonth: { patientCount: 0 },
+                    lastYear: { patientCount: 0 },
+                };
+            }
+
+            if (repurchaseDate === yesterdayDate) {
+                brandWiseData[brandName].yesterday.patientCount++;
+            }
+
+            if (repurchaseDate >= lastMonthDate) {
+                brandWiseData[brandName].lastmonth.patientCount++;
+            }
+
+            if (repurchaseDate >= lastYearDate) {
+                brandWiseData[brandName].lastYear.patientCount++;
+            }
+        }
+
+        // Return the combined report
+        res.status(200).json({ BrandWiseDuration: brandWiseData });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error", success: false });
+    }
+}
+
+//Detail report admin panel...
 function isValidDate(dateString) {
     const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
     return dateRegex.test(dateString);
@@ -1890,6 +2011,8 @@ const adminBranchDetailReport = async (req, res) => {
 
 
 
+
+
 module.exports = {
     handleAdminCreateAccounts,
     handleAdminLogin,
@@ -1914,5 +2037,6 @@ module.exports = {
     adminPatientList,
     adminMRdurationReport,
     adminBranchDetailReport,
-    adminPatientDurationReport
+    adminPatientDurationReport,
+    adminMrPatientDurationReport
 }
