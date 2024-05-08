@@ -1336,7 +1336,7 @@ const patientStatusUpdateDuration = async (req, res) => {
 
             if (!patient || typeof patient.PatientStatus === 'undefined') {
                 console.error('Undefined or missing status for patient:', patient);
-                continue; 
+                continue;
             }
 
             let lastRepurchaseDate = '';
@@ -1347,7 +1347,7 @@ const patientStatusUpdateDuration = async (req, res) => {
 
             let lastRepurchaseDateMoment = moment(lastRepurchaseDate, [
                 moment.ISO_8601,
-                'ddd MMM DD YYYY HH:mm:ss ZZ', 
+                'ddd MMM DD YYYY HH:mm:ss ZZ',
             ]);
 
             console.log("pick date :", lastRepurchaseDateMoment);
@@ -1361,7 +1361,7 @@ const patientStatusUpdateDuration = async (req, res) => {
             console.log(`Standardized Date: ${patient.PatientName} ${lastRepurchaseDateFormatted}`.bgBlue.white);
 
             // Add 4 days to the last repurchase date for testing purposes
-            const nextInactiveDate = moment(lastRepurchaseDateFormatted, 'YYYY-MM-DD').add(4, 'days');
+            const nextInactiveDate = moment(lastRepurchaseDateFormatted, 'YYYY-MM-DD').add(180, 'days');
             console.log("Next Inactive Date:", nextInactiveDate.format("DD-MM-YYYY"));
 
             // Get today's date in "dd-mm-yyyy" format
@@ -1396,8 +1396,8 @@ const patientStatusUpdateDuration = async (req, res) => {
     }
 };
 
-// Set up a timer to call the patientStatusUpdateDuration function every 55 seconds
-const updateInterval = 10000; 
+// Set up a timer to call the patientStatusUpdateDuration function every 10000 seconds
+const updateInterval = 10000;
 setInterval(async () => {
     try {
         await patientStatusUpdateDuration();
