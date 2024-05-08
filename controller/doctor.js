@@ -85,8 +85,8 @@ const getPatientForThisDoctor = async (req, res) => {
             ...doctor.toObject(), patients: doctor.patients.map(patient => ({
                 ...patient.toObject(),
                 // patientTotalUnit: {
-                    ...patient.patientData,
-                    unitTotal: patient.unitTotal
+                ...patient.patientData,
+                unitTotal: patient.unitTotal
                 // }
             }))
         };

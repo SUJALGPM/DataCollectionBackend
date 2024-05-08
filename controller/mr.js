@@ -5,14 +5,10 @@ const PatientModel = require("../models/patient");
 const AdminModel = require("../models/admin");
 const flmModel = require("../models/Flm");
 const brandModel = require("../models/Brands");
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const fs = require("fs");
-const csv = require('csv-parser');
 const xlsx = require('xlsx');
-const patient = require('../models/patient');
-const { format } = require('path');
 const moment = require('moment');
+const colors = require('colors');
+
 
 
 const createMr = async (req, res) => {
@@ -1221,48 +1217,7 @@ const mrGetScheduleData = async (req, res) => {
 
 }
 
-//Final Automatic APIs.......Patient-Status-Update................
-// const mrUpdatePatientStatus = async () => {
-//     try {
-//         // Define patientNewStatus directly within the function
-//         const patientNewStatus = "DISCONTINUE";
-
-//         // Find all patients
-//         const allPatients = await PatientModel.find();
-
-//         // Update the status of patients
-//         for (const patient of allPatients) {
-
-//             //Previous status of patient...
-//             const previousStatus = patient.PatientStatus;
-
-
-//             //Auto time increment logic...
-//             const lastEndOfPurchase = moment(patient.Repurchase.EndOfPurchase);
-//             console.log("Previous Date EOP:", lastEndOfPurchase);
-
-//             const updatedEndOfPurchase = lastEndOfPurchase.add(30, 'seconds').toDate();
-//             console.log("Updated Date EOP:", updatedEndOfPurchase);
-
-
-//             // Set patient status to inactive if updatedEndOfPurchase is in the past
-//             patient.PatientStatus = updatedEndOfPurchase <= new Date() ? true : false;
-//             // patient.PatientStatus = updatedEndOfPurchase <= new Date() ? false : true;
-//             await patient.save();
-
-//             // Print or log patient information
-//             console.log(`Patient ${patient.PatientName} status updated from ${previousStatus} to ${patient.PatientStatus}`);
-//         }
-
-//         console.log(`Updated status for all patients.`);
-//     } catch (err) {
-//         console.error('Error updating patient status:', err);
-//     }
-// };
-// // Schedule the function to run once after a delay of 30 seconds
-// setTimeout(mrUpdatePatientStatus, 30 * 1000);
-
-
+//Final Automatic APIs.......Patient-Status-Update...... after 30 seconds.....
 const mrUpdatePatientStatus = async () => {
     // try {
     //     // Define patientNewStatus directly within the function
@@ -1302,6 +1257,157 @@ const mrUpdatePatientStatus = async () => {
 setTimeout(mrUpdatePatientStatus, 30 * 1000);
 
 
+// Update patient status after 30 days....
+// const patientStatusUpdateDuration = async (req, res) => {
+//     try {
+//         // Find all patients.....
+//         const allPatients = await PatientModel.find();
+
+//         // Update the status of patients
+//         for (const patient of allPatients) {
+
+//             //Get last repurchase of each patient....
+//             let lastRepurchaseDate = '';
+//             patient.Repurchase.forEach((purchase) => {
+//                 console.log('End of purchase', purchase.EndOfPurchase);
+//                 lastRepurchaseDate = purchase.EndOfPurchase
+//             });
+
+//             let lastRepurchaseDate1 = moment(lastRepurchaseDate);
+//             console.log("pick date :", lastRepurchaseDate);
+
+//             if (!lastRepurchaseDate1.isValid()) {
+//                 lastRepurchaseDate1 = moment(patient.Repurchase.EndOfPurchase, "YYYY-MM-DD");
+//             } else {
+//                 lastRepurchaseDate1 = lastRepurchaseDate1.format("YYYY-MM-DD");
+//             }
+
+//             console.log(`Standardized Date: ${patient.PatientName} ${lastRepurchaseDate1}`.bgBlue.white);
+
+//             // Add 4 days to the last repurchase date for testing purposes
+//             const nextInactiveDate = moment(lastRepurchaseDate1, "YYYY-MM-DD").add(4, "days");
+//             console.log("Next Inactive Date:", nextInactiveDate.format("DD-MM-YYYY"));
+
+//             // Get today's date in "dd-mm-yyyy" format
+//             const todayDate = moment().format("DD-MM-YYYY");
+//             console.log("Current Date (dd-mm-yyyy):", todayDate);
+
+
+//             console.log(typeof nextInactiveDate.format("DD-MM-YYYY"));
+//             console.log(typeof todayDate);
+
+//             // Compare dates after formatting them to the same format
+//             if (nextInactiveDate.format("DD-MM-YYYY") <= todayDate) {
+
+//                 // Update patient status to inactive
+//                 patient.PatientStatus = false;
+//                 await patient.save();
+
+//                 // Log the updated patient's name
+//                 console.log(`Updated status for patient: ${patient.PatientName}`.bgYellow.black);
+//             }
+//         }
+
+//         res.status(200).json({ message: "Patient statuses updated successfully." });
+//     } catch (err) {
+//         console.error("Error updating patient statuses:", err);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// };
+
+
+const patientStatusUpdateDuration = async (req, res) => {
+    try {
+        // Find all patients
+        const allPatients = await PatientModel.find();
+
+        // Update the status of patients
+        for (const patient of allPatients) {
+
+            if (!patient) {
+                console.error('Undefined patient object encountered.');
+                continue;
+            }
+
+            if (!patient.Repurchase || !Array.isArray(patient.Repurchase)) {
+                console.error('Invalid Repurchase array for patient:', patient);
+                continue;
+            }
+
+            if (!patient || typeof patient.PatientStatus === 'undefined') {
+                console.error('Undefined or missing status for patient:', patient);
+                continue; 
+            }
+
+            let lastRepurchaseDate = '';
+            patient.Repurchase.forEach((purchase) => {
+                // console.log('End of purchase', purchase.EndOfPurchase);
+                lastRepurchaseDate = purchase.EndOfPurchase;
+            });
+
+            let lastRepurchaseDateMoment = moment(lastRepurchaseDate, [
+                moment.ISO_8601,
+                'ddd MMM DD YYYY HH:mm:ss ZZ', 
+            ]);
+
+            console.log("pick date :", lastRepurchaseDateMoment);
+            if (!lastRepurchaseDateMoment.isValid()) {
+                // Handle invalid dates
+                console.error(`Invalid date format for patient: ${patient.PatientName}`);
+                continue; // Skip to the next patient
+            }
+
+            const lastRepurchaseDateFormatted = lastRepurchaseDateMoment.format('YYYY-MM-DD');
+            console.log(`Standardized Date: ${patient.PatientName} ${lastRepurchaseDateFormatted}`.bgBlue.white);
+
+            // Add 4 days to the last repurchase date for testing purposes
+            const nextInactiveDate = moment(lastRepurchaseDateFormatted, 'YYYY-MM-DD').add(4, 'days');
+            console.log("Next Inactive Date:", nextInactiveDate.format("DD-MM-YYYY"));
+
+            // Get today's date in "dd-mm-yyyy" format
+            const todayDate = moment().format("DD-MM-YYYY");
+            console.log("Current Date (dd-mm-yyyy):", todayDate);
+
+            // // Compare dates after formatting them to the same format
+            // if (nextInactiveDate.format("DD-MM-YYYY") <= todayDate) {
+            //     // Update patient status to inactive
+            //     patient.PatientStatus = false;
+            //     await patient.save();
+
+            //     // Log the updated patient's name
+            //     console.log(`Updated status for patient: ${patient.PatientName}`.bgYellow.black);
+            // }
+
+            if (moment(nextInactiveDate).isSameOrBefore(moment(todayDate, "DD-MM-YYYY"))) {
+                // Update patient status to inactive
+                patient.PatientStatus = false;
+                await patient.save();
+
+                // Log the updated patient's name
+                console.log(`Updated status for patient: ${patient.PatientName}`.bgYellow.black);
+            }
+
+        }
+
+        res.status(200).json({ message: "Patient statuses updated successfully." });
+    } catch (err) {
+        console.error("Error updating patient statuses:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+// Set up a timer to call the patientStatusUpdateDuration function every 55 seconds
+const updateInterval = 10000; 
+setInterval(async () => {
+    try {
+        await patientStatusUpdateDuration();
+    } catch (err) {
+        console.error("Error updating patient status:", err);
+    }
+}, updateInterval);
+
+
+
 
 
 
@@ -1326,5 +1432,6 @@ module.exports = {
     mrAddTodo,
     getMrTodoList,
     deleteMrTodo,
-    getMrAllPatients
+    getMrAllPatients,
+    patientStatusUpdateDuration
 }
