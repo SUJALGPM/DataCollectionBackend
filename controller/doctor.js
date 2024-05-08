@@ -43,6 +43,27 @@ const createDoctor = async (req, res) => {
     }
 }
 
+// const getPatientForThisDoctor = async (req, res) => {
+//     try {
+//         const id = req.params['id'];
+//         const doctor = await DoctorModel.findById({ _id: id }).populate('patients').select('-_id -SCCODE -DRNAME -QUALIFICATION -SPECIALITY -SPECBYPRACTICE -PLANNEDVISITS -CLASS -LOCALITY -STATION -STATE -ADDRESS -PIN -MOBILENO -EMAIL -TOTAL_POTENTIAL -BUSTODIV -PATIENTSPERDAY');
+
+//         if (!doctor) return res.status(400).json({
+//             msg: "No Doctor Found For This MR",
+//             success: false
+//         })
+//         return res.status(200).json(doctor)
+//     }
+//     catch (error) {
+//         const errMsg = error.message
+//         console.log("Error in getPatientForThisDoctor");
+//         return res.status(500).json({
+//             success: false,
+//             errMsg
+//         });
+//     }
+// }
+
 const getPatientForThisDoctor = async (req, res) => {
     try {
         const id = req.params['id'];
@@ -52,7 +73,28 @@ const getPatientForThisDoctor = async (req, res) => {
             msg: "No Doctor Found For This MR",
             success: false
         })
-        return res.status(200).json(doctor)
+
+        // Calculate unitTotal for each patient and add it to the response
+        doctor.patients.forEach(patient => {
+            let unitTotal = patient.Repurchase.reduce((total, repurchase) => total + repurchase.TotolCartiridgesPurchase, 0);
+            patient.unitTotal = unitTotal;
+        });
+
+        // Create a new response object with unitTotal added to each patient under patientData
+        const response = {
+            ...doctor.toObject(), patients: doctor.patients.map(patient => ({
+                ...patient.toObject(),
+                // patientTotalUnit: {
+                    ...patient.patientData,
+                    unitTotal: patient.unitTotal
+                // }
+            }))
+        };
+
+        // Remove the "__v" field from each patient
+        response.patients.forEach(patient => delete patient.__v);
+
+        return res.status(200).json(response);
     }
     catch (error) {
         const errMsg = error.message
