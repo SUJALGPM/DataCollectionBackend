@@ -1091,7 +1091,12 @@ const uplaodSheet = async (req, res) => {
 
             // Check the SLM exists or not
             let existSlm = await slmModel.findOne({ SLMEmpID: row.SLMEmpID });
-            if (!existSlm) {
+            if (existSlm) {
+                existSlm.SLMEmpID = row.SLMEmpID;
+                existSlm.ZBMName = row.ZBMName;
+                existSlm.Password = row.Password;
+                await existSlm.save();
+            } else {
                 // SLM doesn't exist, create new SLM
                 existSlm = new slmModel({
                     SLMEmpID: row.SLMEmpID,
@@ -1106,7 +1111,12 @@ const uplaodSheet = async (req, res) => {
 
             // Check the FLM exists or not
             let existFlm = await flmModel.findOne({ FLMEmpID: row.FLMEmpID });
-            if (!existFlm) {
+            if (existFlm) {
+                existFlm.FLMEmpID = row.FLMEmpID;
+                existFlm.BDMName = row.BDMName;
+                existFlm.Password = row.Password;
+                await existFlm.save();
+            } else {
                 // FLM doesn't exist, create new FLM
                 existFlm = new flmModel({
                     FLMEmpID: row.FLMEmpID,
@@ -1121,7 +1131,17 @@ const uplaodSheet = async (req, res) => {
 
             // Check the MR exists or not
             let existingMr = await MrModel.findOne({ EMPID: row.EMPID });
-            if (!existingMr) {
+            if (existingMr) {
+                existingMr.EMPID = row.EMPID;
+                existingMr.PSNAME = row.PSNAME;
+                existingMr.Region = row.Region;
+                existingMr.Number = row.Number;
+                existingMr.Password = row.Password;
+                existingMr.HQ = row.HQ;
+                existingMr.DOJ = row.DOJ;
+                existingMr.DESIGNATION = row.DESIGNATION;
+                await existingMr.save();
+            } else {
                 // MR doesn't exist, create new MR
                 existingMr = new MrModel({
                     EMPID: row.EMPID,
@@ -1141,8 +1161,28 @@ const uplaodSheet = async (req, res) => {
 
             // Check if a doctor with the same SCCode already exists
             let existingDoctor = await DoctorModel.findOne({ SCCode: row.SCCode.replace('`', '') });
-            if (!existingDoctor) {
+            if (existingDoctor) {
+                // Remove the backtick from SCCode
+                const cleanSCCode = row.SCCode.replace('`', '');
 
+                // Map "Active" and "Inactive" to Boolean values
+                let doctorStatus = true; // Assume default status is "Active"
+                if (row.DoctorStatus === "inactive") {
+                    doctorStatus = false;
+                }
+
+                existingDoctor.SCCode = cleanSCCode;
+                existingDoctor.DoctorName = row.DoctorName;
+                existingDoctor.Specialty = row.Specialty;
+                existingDoctor.Place = row.Place;
+                existingDoctor.CLASS = row.CLASS;
+                existingDoctor.VF = row.VF;
+                existingDoctor.DoctorPotential = row.DoctorPotential;
+                existingDoctor.POBStatus = row.POBStatus;
+                existingDoctor.POBCount = row.POBCount;
+                existingDoctor.DoctorStatus = doctorStatus;
+                await existingDoctor.save();
+            } else {
                 // Remove the backtick from SCCode
                 const cleanSCCode = row.SCCode.replace('`', '');
 
@@ -1171,6 +1211,9 @@ const uplaodSheet = async (req, res) => {
                 // Associate the doctor with the MR
                 existingMr.doctors.push(existingDoctor._id);
                 await existingMr.save();
+
+
+
             }
 
             // Check if a doctor with the same SCCode already exists
@@ -1755,7 +1798,7 @@ const adminPatientDurationReport = async (req, res) => {
 };
 
 //Combine api of adminMRdurationReport + adminPatientDurationReport = CombineOutput... 
-const adminMrPatientDurationReport = async(req,res)=>{
+const adminMrPatientDurationReport = async (req, res) => {
     try {
         const adminId = req.params.id;
 

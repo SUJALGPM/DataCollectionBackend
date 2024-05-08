@@ -493,35 +493,10 @@ const getMrBrandSummary = async (req, res) => {
     }
 }
 
-// const getMrPatients = async (req, res) => {
-//     try {
-//         const mrId = req.params.id;
-//         const mrDet = await MrModel.findById(mrId).populate('doctors');
-
-
-//         // Array to store all patients
-//         let allPatients = [];
-
-//         // Iterate over doctors
-//         for (const doctor of mrDet.doctors) {
-//             // Fetch patients for this doctor
-//             const patients = await PatientModel.find({ _id: { $in: doctor.patients } });
-
-//             // Push patients to allPatients array
-//             allPatients.push(...patients.map(patient => ({
-//                 doctorName: doctor.DoctorName,
-//                 patientDetails: patient
-//             })));
-//         }
-
-//         // Sending response with all patients
-//         res.status(200).json(allPatients);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// }
-
+function isValidDate(dateString) {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+    return dateRegex.test(dateString);
+}
 const getMrPatients = async (req, res) => {
     try {
         const mrId = req.params.id;
@@ -538,6 +513,7 @@ const getMrPatients = async (req, res) => {
             // Push patients to allPatients array
             for (const patient of patients) {
                 for (const repurchase of patient.Repurchase) {
+
                     const patientData = {
                         PatientName: patient.PatientName,
                         MobileNumber: patient.MobileNumber,
@@ -552,7 +528,7 @@ const getMrPatients = async (req, res) => {
                         Status: patient.PatientStatus,
                         DurationOfTherapy: repurchase.DurationOfTherapy,
                         TotolCartiridgesPurchase: repurchase.TotolCartiridgesPurchase,
-                        DateOfPurchase: repurchase.DateOfPurchase,
+                        DateOfPurchase: isValidDate(repurchase.DateOfPurchase) ? repurchase.DateOfPurchase : new Date(repurchase.DateOfPurchase).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('-'),
                         TherapyStatus: repurchase.TherapyStatus,
                         Delivery: repurchase.Delivery,
                         TM: repurchase.TM,
@@ -634,7 +610,7 @@ const getMrAllPatients = async (req, res) => {
     }
 }
 
-//Update the status automatically..
+//Update the status patient..
 // const mrUpdatePatientStatus = async (req, res) => {
 //     try {
 
@@ -1324,6 +1300,11 @@ const mrUpdatePatientStatus = async () => {
     // }
 };
 setTimeout(mrUpdatePatientStatus, 30 * 1000);
+
+
+
+
+
 
 
 module.exports = {
