@@ -1397,7 +1397,7 @@ const patientStatusUpdateDuration = async (req, res) => {
 };
 
 // Set up a timer to call the patientStatusUpdateDuration function every 10000 seconds
-const updateInterval = 10000;
+const updateInterval = 24 * 60 * 60 * 1000;
 setInterval(async () => {
     try {
         await patientStatusUpdateDuration();
