@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require("multer")
 
-const { createMr, loginMr, getDoctorForThisMr, getAllMR, getMrById, UpdateMrMobileNumber, handleExcelSheetUpload, getMrDoctorSummary, getMrBrandSummary, getMrPatients, mrUpdatePatientStatus, mrAddNewBrand, mrGetDoctorBrandWise, mrGetDataBrandWise, mrGetScheduleData, mrAddTodo, getMrTodoList, deleteMrTodo, getMrAllPatients, patientStatusUpdateDuration } = require('../controller/mr');
+const { createMr, loginMr, getDoctorForThisMr, getAllMR, getMrById, UpdateMrMobileNumber, handleExcelSheetUpload, getMrDoctorSummary, getMrBrandSummary, getMrPatients, mrUpdatePatientStatus, mrAddNewBrand, mrGetDoctorBrandWise, mrGetDataBrandWise, mrGetScheduleData, mrAddTodo, getMrTodoList, deleteMrTodo, getMrAllPatients, patientStatusUpdateDuration, mrforgetPassword } = require('../controller/mr');
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -26,6 +26,9 @@ router.get("/get-mr-todo-list/:id", getMrTodoList);
 router.post("/delete-mr-todotask/:id/:taskId", deleteMrTodo);
 router.get("/get-mr-All-patients/:mrId", getMrAllPatients);
 router.get("/patient-Status-Duration", patientStatusUpdateDuration);
+router.post("/mr-forget-password", mrforgetPassword);
+
+
 
 
 module.exports = router;

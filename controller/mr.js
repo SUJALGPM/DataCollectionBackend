@@ -8,6 +8,7 @@ const brandModel = require("../models/Brands");
 const xlsx = require('xlsx');
 const moment = require('moment');
 const colors = require('colors');
+const nodemailer = require("nodemailer");
 
 
 
@@ -1257,65 +1258,6 @@ const mrUpdatePatientStatus = async () => {
 setTimeout(mrUpdatePatientStatus, 30 * 1000);
 
 
-// Update patient status after 30 days....
-// const patientStatusUpdateDuration = async (req, res) => {
-//     try {
-//         // Find all patients.....
-//         const allPatients = await PatientModel.find();
-
-//         // Update the status of patients
-//         for (const patient of allPatients) {
-
-//             //Get last repurchase of each patient....
-//             let lastRepurchaseDate = '';
-//             patient.Repurchase.forEach((purchase) => {
-//                 console.log('End of purchase', purchase.EndOfPurchase);
-//                 lastRepurchaseDate = purchase.EndOfPurchase
-//             });
-
-//             let lastRepurchaseDate1 = moment(lastRepurchaseDate);
-//             console.log("pick date :", lastRepurchaseDate);
-
-//             if (!lastRepurchaseDate1.isValid()) {
-//                 lastRepurchaseDate1 = moment(patient.Repurchase.EndOfPurchase, "YYYY-MM-DD");
-//             } else {
-//                 lastRepurchaseDate1 = lastRepurchaseDate1.format("YYYY-MM-DD");
-//             }
-
-//             console.log(`Standardized Date: ${patient.PatientName} ${lastRepurchaseDate1}`.bgBlue.white);
-
-//             // Add 4 days to the last repurchase date for testing purposes
-//             const nextInactiveDate = moment(lastRepurchaseDate1, "YYYY-MM-DD").add(4, "days");
-//             console.log("Next Inactive Date:", nextInactiveDate.format("DD-MM-YYYY"));
-
-//             // Get today's date in "dd-mm-yyyy" format
-//             const todayDate = moment().format("DD-MM-YYYY");
-//             console.log("Current Date (dd-mm-yyyy):", todayDate);
-
-
-//             console.log(typeof nextInactiveDate.format("DD-MM-YYYY"));
-//             console.log(typeof todayDate);
-
-//             // Compare dates after formatting them to the same format
-//             if (nextInactiveDate.format("DD-MM-YYYY") <= todayDate) {
-
-//                 // Update patient status to inactive
-//                 patient.PatientStatus = false;
-//                 await patient.save();
-
-//                 // Log the updated patient's name
-//                 console.log(`Updated status for patient: ${patient.PatientName}`.bgYellow.black);
-//             }
-//         }
-
-//         res.status(200).json({ message: "Patient statuses updated successfully." });
-//     } catch (err) {
-//         console.error("Error updating patient statuses:", err);
-//         res.status(500).json({ error: "Internal server error" });
-//     }
-// };
-
-
 const patientStatusUpdateDuration = async (req, res) => {
     try {
         // Find all patients
@@ -1407,13 +1349,64 @@ setInterval(async () => {
 }, updateInterval);
 
 
+const mrforgetPassword = async (req, res) => {
+    try {
+
+        const { MRID } = req.body;
+        const mrExist = await MrModel.findOne({ EMPID: MRID });
+
+        if (!mrExist) {
+            return res.status(404).send({ message: "MR Not found...!!!", success: false });
+        }
+
+        // Send the password directly via email
+        const mrEmail = mrExist.Email;
+        const mrPassword = mrExist.Password;
+
+        // NodeMailer Configuration
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'digilateraldev@gmail.com',
+                pass: 'ohax atcp umht xked'
+            }
+        });
+
+        // Email content
+        var mailOptions = {
+            from: 'digiLateraliCreateVideoPanel@gmail.com',
+            to: mrEmail,
+            subject: 'Restore forget Password👍',
+            html: `
+              <div style="border: 1px solid #000; padding: 10px; text-align: center;">
+                <h3 style="text-align: center;">Dear : ${mrExist.PSNAME}</h3>
+                <p> Your Password For <span style="background-color: blue; color: white; padding: 3px;">DataCollection Panel </span> : ${mrPassword}</p>
+                <p>Please keep this information secure.</p>
+                <p>If you didn't request this, please ignore this email.</p>
+              </div>
+            `
+        };
+
+        // Send the email
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+                return res.status(500).send({ message: "Error sending email", success: false });
+            } else {
+                console.log('Email sent: ' + info.response);
+                return res.status(200).send({ message: "Password sent successfully", success: true });
+            }
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+}
 
 
 
 
-
-
-module.exports = {
+module.exports = {  
     createMr,
     loginMr,
     getDoctorForThisMr,
@@ -1433,5 +1426,6 @@ module.exports = {
     getMrTodoList,
     deleteMrTodo,
     getMrAllPatients,
-    patientStatusUpdateDuration
+    patientStatusUpdateDuration,
+    mrforgetPassword
 }

@@ -219,3 +219,9 @@
 05-08-2024 17:59:17 [VERBOSE] GET /patient-Status-Duration - 304  
 05-08-2024 18:02:08 [VERBOSE] GET /api/patient-Status-Duration : {}
 05-08-2024 18:02:09 [VERBOSE] GET /patient-Status-Duration - 304  
+05-11-2024 10:31:35 [VERBOSE] POST /api/mr-forget-password : {"MRID":"E57012"}
+05-11-2024 10:31:36 [VERBOSE] POST /mr-forget-password - 500  
+05-11-2024 10:33:47 [VERBOSE] POST /api/mr-forget-password : {"MRID":"E57012"}
+05-11-2024 10:33:51 [VERBOSE] POST /mr-forget-password - 200  
+05-11-2024 10:34:51 [VERBOSE] POST /api/mr-forget-password : {"MRID":"E57012"}
+05-11-2024 10:34:56 [VERBOSE] POST /mr-forget-password - 200  

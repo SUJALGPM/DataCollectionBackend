@@ -11,6 +11,10 @@ const mrSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    Email: {
+        type: String,
+        required: false
+    },
     Password: {
         type: String,
         required: false
